@@ -8,7 +8,7 @@ A one-page web app for **finding new colour pairings**. It shows a stream of ran
 
 ## What it does
 
-1. **Photo stream.** It loads random Unsplash photos across a wide spread of subjects, using a rotating list of search terms like MDS's. You move between photos with on-screen arrows and the keyboard arrow keys. Each photo shows the photographer's credit, which Unsplash's rules require.
+1. **Photo stream.** It loads random Unsplash photos across a wide spread of subjects, using a rotating list of search terms like MDS's. You move between photos with on-screen arrows and the keyboard arrow keys, and the space bar jumps to a new random photo. Each photo shows the photographer's credit, which Unsplash's rules require.
 2. **Automatic pairing.** Each photo's palette is analysed in the browser, and a strong background colour and text colour are picked from it.
 3. **Colour panel.** The pair appears next to the photo, with sample text you can type into. You can choose from the same seven fonts MDS uses (Geist, Geist Mono, Instrument Serif, Alpha Lyrae, Departure Mono, Ghost Byte, Input Mono). I'll handle their licences myself.
 4. **Contrast score.** The score is always visible, with a switch between **WCAG** and **APCA**, and it shows whether the pair passes.
@@ -56,4 +56,3 @@ A one-page web app for **finding new colour pairings**. It shows a stream of ran
 ## Open points
 
 1. Should the name and interface text use British spelling ("Colour Shift")?
-2. Should the space bar jump to a new random photo, like in MDS's app?

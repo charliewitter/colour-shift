@@ -1,6 +1,6 @@
 # Colour Shift
 
-One-page web app for finding new colour pairings from random Unsplash photos, with contrast scoring and slider fine-tuning. Full spec: `SPEC.md`. Read it before planning any work.
+One-page web app for finding new colour pairings from random Unsplash photos, with contrast scoring and slider fine-tuning. Full spec: `SPEC.md` (what to build). Build rules + behaviour: `APP-SPEC.md`. Look + motion: `COLOUR-SHIFT-STYLE-GUIDE.md`. Read all three before planning any work.
 
 Reference project: `../color-shift` (by MDS). Use it for reference only; don't copy code from it.
 
