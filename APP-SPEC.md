@@ -30,22 +30,27 @@ A single-page web app for finding new colour pairings. It shows random Unsplash 
 
 ## Content
 
-**Desktop (640px and wider)**
+**Desktop (640px and wider).** Figma is the visual source of truth: [Colour Shift](https://www.figma.com/design/IFKpGTC3reLa2GWP6go6KH/Colour-Shift?node-id=0-1). Its layer names are listed under the diagram.
 ```
 ┌──────────────────────┬──────────────────────┐
+│ [FONT ▾]             │                      │
 │   Colour panel       │   Photo panel        │
 │   bg colour +        │   Unsplash photo,    │
 │   sample text in     │   arrows on hover,   │
 │   fg colour          │   credit bottom-right│
 ├──────────────────────┴──────────────────────┤
-│ Slider panel (opens upward): mode tabs +    │
-│ 3 sliders                                   │
+│ Slider panel (opens upward, pushes stage up)│
+│ OKLCH HSB RGB              [channel readout]│
+│ ━━━━━━━━━━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━━━━ │
+│ ━━━━━━━━━━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━━━━ │
+│ ━━━━━━━━━━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━━━━ │
 ├─────────────────────────────────────────────┤
-│ [FG] [⇄] [BG]              [score] [EXPORT] │
+│ ■FG ⇄ ■BG   WCAG|APCA  score   ← → EXPORT   │
 └─────────────────────────────────────────────┘
 ```
+Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`panel=none|score|export`), `colour selectors`, `a11y module`, `export`, `font dropdown`, `font menu`, `channel readout`.
 
-**Mobile (narrower than 640px)**
+**Mobile (narrower than 640px).** Not designed yet; this is a placeholder. Designs come after desktop.
 ```
 ┌──────────────────────┐
 │ [score]     [EXPORT] │
@@ -59,34 +64,34 @@ A single-page web app for finding new colour pairings. It shows random Unsplash 
 ```
 
 **On screen:**
-- **Colour panel:** background colour, with editable sample text in the fg colour. Empty text shows "Aa".
-- **Photo panel:** current photo, previous/next arrows, and the photographer credit linking to Unsplash.
-- **Control bar:** FG swatch, swap button, BG swatch, contrast score, EXPORT.
-- **Slider panel:** OKLCH / HSB / RGB tabs, three sliders, CLOSE.
-- **Score panel:** WCAG / APCA switch, threshold up/down buttons.
-- **Export panel:** COPY HEX, COPY URL, DOWNLOAD .MD.
+- **Colour panel:** background colour, with editable sample text in the fg colour. Starts as "Aa"; empty text shows "Aa". Font dropdown top-left.
+- **Photo panel:** current photo, previous/next arrows on hover, and the photographer credit linking to Unsplash.
+- **Dock:** fg picker (swatch + hex), swap button, bg picker (swatch + hex) · WCAG/APCA switch, threshold levels (when open), score · ← → photo arrows (same as the photo-panel arrows), EXPORT. No FG/BG labels.
+- **Slider panel:** OKLCH / HSB / RGB tabs, channel readout, three sliders. No CLOSE button.
+- **Export (in dock):** COPY URL, DOWNLOAD .MD, CLOSE.
 
-**Contrast grades**
+**Contrast grades.** Each level is a threshold button (WCAG `1.5 3.0 4.5 7.0`, APCA `30 45 60 75 90`).
 
 | WCAG 2 (ratio) | Grade |
 |---|---|
 | ≥ 7.0 | AAA |
 | ≥ 4.5 | AA |
 | ≥ 3.0 | AA Large |
-| < 3.0 | Fail |
+| ≥ 1.5 | Display (bare minimum: huge display/marketing text, unselected states) |
+| < 1.5 | Fail |
 
 | APCA (Lc, absolute) | Grade |
 |---|---|
-| ≥ 75 | Body ✓ |
+| ≥ 90 | Body+ (preferred body text) |
+| ≥ 75 | Body |
 | ≥ 60 | Content |
 | ≥ 45 | Headlines |
 | ≥ 30 | Spot |
 | < 30 | Fail |
 
-The score shows the grade and the value: `AA 5.21:1` or `Content Lc 64.3`.
+The score shows the grade and the value, taken from the contrast check: `AA 5.21:1` or `Content Lc 64.3`. Mixed case on purpose (data, not a label). The Figma mockup values are illustrative, not accurate; the build uses real scores.
 
 **Exports**
-- **Copy hex:** `#1A1718 / #E5E0E0`
 - **Share URL:** `/?photo=<id>&bg=<hex>&fg=<hex>&algo=wcag|apca&swap=1&text=<text>`
 - **Markdown file:** both colours (hex, RGB, OKLCH), score and grade for the active method, share URL, photo credit.
 
@@ -130,18 +135,21 @@ Full detail is in `COLOUR-SHIFT-STYLE-GUIDE.md`. The essentials:
 - Default: darker colour as background. Swap flips it.
 
 **Controls**
-- Tap FG or BG → slider panel opens for that colour. Tap the same one again → closes.
+- The slider panel only shows when fg or bg is selected. Tap fg or bg → it opens for that colour, and that picker shows its `active` state so it's clear which colour is being edited. Tap the other one → the panel switches colour and stays open. Tap the same one again → closes.
 - Switching slider mode doesn't change the colour at all.
 - OKLCH chroma is capped at the maximum in-gamut value for the current lightness and hue.
-- Tap score → score panel. Threshold buttons nudge the colour being edited to the next grade up or down.
-- Tap EXPORT → export panel. After an action, the label briefly confirms (`COPY URL` → `COPIED URL`).
+- Channel readout (e.g. `SATURATION 56.5`) is hidden by default. It shows while a slider is being dragged or keyboard-adjusted, updates live, and fades out ~1s after release.
+- Tap the score text → threshold levels open or close.
+- The highlighted level is the highest one the pair currently passes. Clicking any level moves the edited colour until the pair just reaches that level (up or down), so every level is one click away. If no colour is selected, the text (fg) colour moves.
+- Tap EXPORT → export options. After an action, the label briefly confirms (`COPY URL` → `COPIED URL`).
+- The slider panel, score levels and export can all be open at the same time.
 - The clipboard falls back to an older method when the modern API is blocked.
 
 **Share links**
 - Opening a share URL restores the photo, colours, contrast method, swap state and sample text, then fills the buffer with random photos.
 
 **Keyboard**
-- ← → : previous / next photo
+- ← → : previous / next photo (same as both sets of on-screen arrows). Ignored while editing text.
 - Space: jump to a new random photo, inserted after the current one so ← still goes back. Ignored while editing text.
 - Esc: close any open panel
 

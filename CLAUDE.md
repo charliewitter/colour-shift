@@ -2,6 +2,8 @@
 
 One-page web app for finding new colour pairings from random Unsplash photos, with contrast scoring and slider fine-tuning. Full spec: `SPEC.md` (what to build). Build rules + behaviour: `APP-SPEC.md`. Look + motion: `COLOUR-SHIFT-STYLE-GUIDE.md`. Read all three before planning any work.
 
+Design: [Figma, Colour Shift](https://www.figma.com/design/IFKpGTC3reLa2GWP6go6KH/Colour-Shift?node-id=0-1). Source of truth for desktop visuals; wins over the style guide where they differ. Mockup contrast values are illustrative only. Mobile not designed yet.
+
 Reference project: `../color-shift` (by MDS). Use it for reference only; don't copy code from it.
 
 ## Communication

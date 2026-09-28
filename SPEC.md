@@ -8,13 +8,12 @@ A one-page web app for **finding new colour pairings**. It shows a stream of ran
 
 ## What it does
 
-1. **Photo stream.** It loads random Unsplash photos across a wide spread of subjects, using a rotating list of search terms like MDS's. You move between photos with on-screen arrows and the keyboard arrow keys, and the space bar jumps to a new random photo. Each photo shows the photographer's credit, which Unsplash's rules require.
+1. **Photo stream.** It loads random Unsplash photos across a wide spread of subjects, using a rotating list of search terms like MDS's. You move between photos with on-screen arrows (on the photo and in the control bar) and the keyboard arrow keys, and the space bar jumps to a new random photo. Each photo shows the photographer's credit, which Unsplash's rules require.
 2. **Automatic pairing.** Each photo's palette is analysed in the browser, and a strong background colour and text colour are picked from it.
 3. **Colour panel.** The pair appears next to the photo, with sample text you can type into. You can choose from the same seven fonts MDS uses (Geist, Geist Mono, Instrument Serif, Alpha Lyrae, Departure Mono, Ghost Byte, Input Mono). I'll handle their licences myself.
-4. **Contrast score.** The score is always visible, with a switch between **WCAG** and **APCA**, and it shows whether the pair passes.
-5. **Fine-tuning.** Full sliders for either colour, with **OKLCH / HSB / RGB** modes. A swap button flips text and background. "Bump to threshold" buttons nudge a colour until the pair reaches the next pass level.
+4. **Contrast score.** The score is always visible, with a switch between **WCAG** and **APCA**, and it shows whether the pair passes. Clicking it shows every threshold level; clicking a level moves the colour to reach it.
+5. **Fine-tuning.** Full sliders for either colour, with **OKLCH / HSB / RGB** modes. A swap button flips text and background. The sliders only show once you pick the text or background colour to edit.
 6. **Keeping a pair:**
-   - **Copy hex codes** for both colours.
    - **Copy a share link** that reopens the same photo, colours, contrast method and sample text.
    - **Download a Markdown file** with the colours, score, share link and photo credit.
 

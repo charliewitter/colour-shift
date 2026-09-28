@@ -2,7 +2,7 @@
 
 How Colour Shift looks and moves. Companion to `SPEC.md` (what) and `APP-SPEC.md` (how it works).
 
-Values were taken from MDS's reference repo (`../color-shift`) on 2026-09-24. Check against it when in doubt, but don't copy code.
+Values were taken from MDS's reference repo (`../color-shift`) on 2026-09-24. The Figma file ([Colour Shift](https://www.figma.com/design/IFKpGTC3reLa2GWP6go6KH/Colour-Shift?node-id=0-1)) is the source of truth for desktop visuals; where it differs from this guide, Figma wins. Its mockup contrast values are illustrative only.
 
 ## Principle
 
@@ -25,7 +25,8 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 ## Typography
 
 - **UI font:** Input Mono, 12px (`text-xs`), `leading-none`. 14px on mobile.
-- **Labels are UPPERCASE:** `FG`, `BG`, `EXPORT`, `COPY URL`, `DOWNLOAD .MD`, `CLOSE`, `OKLCH`.
+- **Labels are UPPERCASE:** `EXPORT`, `COPY URL`, `DOWNLOAD .MD`, `CLOSE`, `OKLCH`, `HUE`. No FG/BG labels; the swatch + hex speaks for itself.
+- **Score text keeps the case the contrast check returns** (`Content Lc 74.9`, `AA Large 4.45:1`). It's data, not a label.
 - **Numbers** use tabular figures so scores don't jiggle.
 - **Sample text:** the chosen specimen font, `leading-[1.05]`, `tracking-tight`, centred.
 - **Specimen fonts:** Geist, Geist Mono, Instrument Serif, Alpha Lyrae, Departure Mono, Ghost Byte, Input Mono. Default: Departure Mono.
@@ -34,9 +35,9 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 
 - **Button:** `p-2`, `rounded-[4px]`, label plus optional swatch with `gap-2`.
 - **Swatch:** 12×12px, `rounded-[2px]`, 1px inner border (white 10% on dark colours, black 10% on light).
-- **Photo arrows:** 40×40px, `rounded-[4px]`, canvas background, 20px icon.
+- **Photo arrows:** two sets doing the same thing. On the photo: 40×40px, `rounded-[4px]`, canvas background, 20px icon, shown on hover. In the dock: 16px ← → icons next to EXPORT.
 - **Dock:** 16px padding (`p-4`). Gaps between controls 4–16px (`gap-1` to `gap-4`).
-- **Slider:** track 6–8px tall and rounded, custom 24px grip.
+- **Slider:** 6px rounded track showing a live gradient of that channel, 12px round white grip.
 - **Radius:** 4px everywhere, except swatches (2px) and fully round items.
 
 ## Button states
