@@ -27,3 +27,6 @@ pnpm-debug.log*
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# licensed fonts: local use only, never commit (public repo; web licence needed before deploy)
+public/fonts/

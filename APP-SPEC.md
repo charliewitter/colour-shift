@@ -50,16 +50,19 @@ A single-page web app for finding new colour pairings. It shows random Unsplash 
 ```
 Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`panel=none|score|export`), `colour selectors`, `a11y module`, `export`, `font dropdown`, `font menu`, `channel readout`.
 
-**Mobile (narrower than 640px).** Not designed yet; this is a placeholder. Designs come after desktop.
+**Mobile (narrower than 640px).** A starting point, to be explored further. Not designed in Figma yet.
 ```
 ┌──────────────────────┐
-│ [score]     [EXPORT] │
-├──────────────────────┤
-│   Colour panel       │
-├──────────────────────┤
 │   Photo panel        │
 ├──────────────────────┤
-│ [FG]   [⇄]    [BG]   │
+│   Colour panel       │
+│   (sample text)      │
+├──────────────────────┤
+│ Slider panel (opens  │
+│ upward when needed)  │
+├──────────────────────┤
+│ Dock, pinned to the  │
+│ bottom of the page   │
 └──────────────────────┘
 ```
 
@@ -77,17 +80,19 @@ Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`pane
 | ≥ 7.0 | AAA |
 | ≥ 4.5 | AA |
 | ≥ 3.0 | AA Large |
-| ≥ 1.5 | Display (bare minimum: huge display/marketing text, unselected states) |
+| ≥ 1.5 | Incidental (not a WCAG level; WCAG's term for text exempt from contrast rules: huge display text, unselected/inactive states, decoration) |
 | < 1.5 | Fail |
 
 | APCA (Lc, absolute) | Grade |
 |---|---|
-| ≥ 90 | Body+ (preferred body text) |
+| ≥ 90 | Preferred Body |
 | ≥ 75 | Body |
 | ≥ 60 | Content |
-| ≥ 45 | Headlines |
+| ≥ 45 | Headline |
 | ≥ 30 | Spot |
 | < 30 | Fail |
+
+Labels follow the official terms: WCAG 2 SC 1.4.3 / 1.4.6, and APCA Bronze Simple Mode (which has descriptions, not short labels, so these are the shortest faithful versions).
 
 The score shows the grade and the value, taken from the contrast check: `AA 5.21:1` or `Content Lc 64.3`. Mixed case on purpose (data, not a label). The Figma mockup values are illustrative, not accurate; the build uses real scores.
 
