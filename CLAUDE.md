@@ -8,7 +8,20 @@ Reference project: `../color-shift` (by MDS). Use it for reference only; don't c
 
 ## Communication
 
-When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
+When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision. Exception: the teaching parts below are written in plain, full sentences.
+
+## Teaching
+
+This is my first project run like this; I'm learning as we go.
+
+- **Plans** include a "What's going on" section: 2–4 plain-language points on why the step is shaped this way.
+- **After each step**, add a "Worth knowing" note: the 1–2 ideas from the step that will come up again.
+- **Checkpoints for me:**
+  - Have me run the key commands myself (`! pnpm dev` etc.) instead of running them silently.
+  - Tell me what to look for when I check in the browser.
+  - Point me to one small file to read and explain it.
+- **Going deeper:** if a topic is worth more than a quick note, offer to send it to my learning space with the `learn` skill rather than derailing the build.
+- Don't explain things I've clearly already got. Keep each note short.
 
 ## How we work
 
