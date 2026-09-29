@@ -53,13 +53,13 @@ src/
 │   ├── page.tsx            # Renders <ColorShift /> only
 │   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + Input Mono @font-face + base styles
 ├── components/
-│   ├── color-shift.tsx     # Client component holding ALL state: colours, active colour, colour mode, contrast method. Esc handler
+│   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open. Esc handler
 │   ├── stage.tsx           # Colour panel (painted from props) + photo panel (placeholder until step 3)
 │   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
-│   ├── dock.tsx            # 3-column grid: colour pickers + swap | method switch + score | (arrows, export later)
-│   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, slider
+│   ├── dock.tsx            # 2 halves: pickers + swap … method switch | centre | levels + score … (arrows, export later)
+│   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider
 ├── lib/
-│   └── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, score text
+│   └── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text
 └── types/
     └── apca-w3.d.ts        # Hand-written types; apca-w3 ships none
 public/icons/               # SVG icons downloaded from Figma (committed)
@@ -70,6 +70,8 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **`AGENTS.md` must stay.** `next dev` writes its Next.js rules block into `AGENTS.md` if that file exists. Otherwise it appends the block to our `CLAUDE.md`.
 - **Score display truncates, never rounds** (4.499 shows `4.49`, not a passing-looking `4.50`). Grades use the real value; APCA grades use its absolute value.
 - **Colours are culori objects kept in the mode last edited in** (not hex). Hex is derived for display and scoring. Keeps a grey's hue and avoids 0–255 rounding while dragging. OKLCH chroma is capped at the sRGB gamut edge.
+- **Anchors** (ADR 0005): `color-shift.tsx` keeps `anchors` beside `colors`. User edits set both; level clicks derive `colors` from `anchors` and never touch them.
+- **Dock is two equal halves** split at the screen centre: pickers left, contrast method switch ends 12px left of centre; levels + score start 12px right of centre and grow rightwards. The switch never moves. Score: standard button states, white text while levels are open.
 - **Slider** = invisible native `<input type="range">` on top (drag, keys, a11y) + drawn track/grip beneath. Grip centre travels 12px in from each end to match the 24px native thumb.
 - **Colours from state** are the one allowed inline `style` colour (stage, swatch). Chrome colours always use token classes.
 - **`transition`** uses the style guide's default timing, set via `--default-transition-*` in `@theme`.

@@ -4,7 +4,31 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
-## 2026-09-29: Step 2, part A (active colour and sliders), in progress
+## 2026-09-29: Step 2, part B (levels)
+
+**Done**
+- Engine: `getPassingLevel`, `formatLevel`, `reachLevel` (sample 101 lightnesses, bisect each pass/fail crossing keeping the passing side, take the crossing nearest the current lightness; out of reach → the stronger end). `getGrade` reuses `getPassingLevel`. `Role`/`Pair` types moved into the engine.
+- Score is a button that opens/closes the levels (selected look while open). Levels: recessed `well` buttons, passing level raised. Clicking moves the active colour, or the text colour if none. Esc closes levels too.
+- Checked in node: every WCAG and APCA level lands on or just above target with hue kept; APCA 90 on mid-grey stops at Content Lc -68.5. Browser check (user) passed.
+
+**Decided**
+- **Contrast method switch is pinned to the screen centre** (user request). Dock is two equal halves; the switch ends 12px left of centre and the levels and score start 12px right of it (24px gap centred on the page), growing rightwards, so nothing to its right can move it. Replaced an interim fix (a fixed-width score slot), which is no longer needed.
+- **Score is a plain toggle, not a selected button** (user redesign in Figma). Muted at rest, hover fill, pressed outline like other buttons; white text while the levels are open, no box.
+- **Level buttons lost their inner shadow** (user; removed in Figma too). Flat `well` fill.
+- **Levels move from an anchor colour** (ADR 0005, new CONTEXT term). Repeated level clicks were compounding gamut clamps and washing colours out to grey (90 → 30: `#907478` before, `#d2456b` after). From user feedback.
+
+**Loose ends**
+- Focus ring looked too bright to the user (it shows on the last-clicked button after pressing Esc/Tab: `:focus-visible` heuristics). Proposed: soften `--cs-focus` from white 30% to 20%. Not decided yet; ask the user. Rejected options: matching `stroke` (≈1.9:1, too faint for keyboard users), blurring on Esc (loses keyboard place).
+
+**Ideas for later**
+- Undo / history of earlier pairs (user idea). Out of scope in SPEC ("saved collections or history"), so it needs a spec change first; revisit after step 8.
+
+**Next**
+- Step 3: Unsplash photos and palette extraction. Plan first.
+
+---
+
+## 2026-09-29: Step 2, part A (active colour and sliders)
 
 **Done**
 - Engine: colours as culori objects in their last-edited mode; `CHANNELS` for OKLCH/HSB/RGB; `getChannel`/`setChannel`; gamut-capped OKLCH chroma (`maxChroma` binary search); live track gradients; contrast now scores the displayed hex.

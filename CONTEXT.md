@@ -22,6 +22,10 @@ _Avoid_: BG, fill
 Whichever of the two colours is selected for editing. There may be none. It follows the colour value, not the role: after a swap, the same value stays active in its new role.
 _Avoid_: current colour, focused colour
 
+**Anchor colour**:
+A colour as the user last set it (with the sliders, or from the photo). Choosing a level moves the colour starting from its anchor, so repeated level clicks never wash it out; only the user's own edits move the anchor.
+_Avoid_: original colour, base colour, source colour
+
 **Swap**:
 Exchanging the text colour and background colour.
 _Avoid_: flip, invert, reverse

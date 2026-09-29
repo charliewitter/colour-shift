@@ -4,6 +4,10 @@ import { APCAcontrast, sRGBtoY } from "apca-w3";
 
 export type { Color };
 
+/** Which colour of the pair (CONTEXT.md: Text colour, Background colour). */
+export type Role = "text" | "bg";
+export type Pair = Record<Role, Color>;
+
 // ── Colours ───────────────────────────────────────────────────────────
 // A colour is kept in the mode it was last edited in, at full precision.
 // Hex is only derived for display, so a grey keeps its hue and dragging
@@ -141,12 +145,62 @@ export function getContrast(text: Color, bg: Color, method: ContrastMethod): num
 
 /** Highest grade the value reaches, or "Fail". APCA grades ignore the sign. */
 export function getGrade(value: number, method: ContrastMethod): string {
-  const size = Math.abs(value);
-  let grade = "Fail";
-  LEVELS[method].forEach((level, i) => {
-    if (size >= level) grade = GRADES[method][i];
-  });
-  return grade;
+  const level = getPassingLevel(value, method);
+  return level === null ? "Fail" : GRADES[method][LEVELS[method].indexOf(level)];
+}
+
+/** The highest level the value meets (CONTEXT.md: Passing level), or null. */
+export function getPassingLevel(value: number, method: ContrastMethod): number | null {
+  const passed = LEVELS[method].filter((level) => Math.abs(value) >= level);
+  return passed.length ? passed[passed.length - 1] : null;
+}
+
+export function formatLevel(level: number, method: ContrastMethod): string {
+  return method === "wcag" ? level.toFixed(1) : String(level);
+}
+
+/**
+ * Moves one colour's OKLCH lightness until the pair just reaches `target`,
+ * keeping hue (chroma is capped to gamut on the way). Contrast dips to ~1 where
+ * both colours match and rises towards black and white, so there can be a
+ * crossing on each side: take the one nearest the current lightness. If the
+ * target is out of reach, go to whichever end gives the most contrast.
+ */
+export function reachLevel(pair: Pair, role: Role, target: number, method: ContrastMethod): Color {
+  const [lightness] = CHANNELS.oklch;
+  const withLightness = (l: number) => setChannel(pair[role], "oklch", lightness, l * 100);
+  const strength = (l: number) => {
+    const moved = { ...pair, [role]: withLightness(l) };
+    return Math.abs(getContrast(moved.text, moved.bg, method));
+  };
+  const passes = (l: number) => strength(l) >= target;
+
+  const current = inMode(pair[role], "oklch").l ?? 0;
+  const STEPS = 100;
+  const samples = Array.from({ length: STEPS + 1 }, (_, i) => i / STEPS);
+
+  // Each sign change between neighbouring samples hides a crossing; bisect to it,
+  // always keeping the passing side so the result really meets the level.
+  const crossings: number[] = [];
+  for (let i = 0; i < STEPS; i++) {
+    let a = samples[i];
+    let b = samples[i + 1];
+    if (passes(a) === passes(b)) continue;
+    if (!passes(b)) [a, b] = [b, a]; // b passes, a doesn't
+    for (let j = 0; j < 24; j++) {
+      const mid = (a + b) / 2;
+      if (passes(mid)) b = mid;
+      else a = mid;
+    }
+    crossings.push(b);
+  }
+
+  if (crossings.length === 0) {
+    // Nowhere passes (or everywhere does): best effort is the stronger end.
+    return withLightness(strength(0) >= strength(1) ? 0 : 1);
+  }
+  const nearest = crossings.reduce((best, l) => (Math.abs(l - current) < Math.abs(best - current) ? l : best));
+  return withLightness(nearest);
 }
 
 /** Score text for the dock: `AA 5.21:1` or `Content Lc -64.3`. */

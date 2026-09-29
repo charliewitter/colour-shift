@@ -1,0 +1,5 @@
+# Levels move from the anchor colour, not the current colour
+
+Choosing a level changes a colour's OKLCH lightness and caps its chroma at what sRGB can show at that lightness. Near black or white that cap is almost zero, so the colour turns grey. When each level click worked from the previous result, those losses stacked up: 90 → 30 on the starting pink gave a muddy `#907478` instead of `#d2456b`, and the original colour couldn't be recovered.
+
+So each colour also has an **anchor**: the colour as the user last set it (sliders now; the photo from step 3). Level clicks always calculate from the anchor, and only user edits move it. Swap swaps anchors too. The cost is a second copy of each colour in state, and one rule to remember: anything that "sets" a colour on the user's behalf must update the anchor, and anything that merely derives from it (levels) must not. Considered instead: storing chroma as a fraction of the gamut maximum. Rejected as more complex, and it still loses the hue of greys.
