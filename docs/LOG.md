@@ -24,6 +24,9 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - The photo arrows are their own piece in code, not part of export.
 - 7 specimen fonts, default Departure Mono. Sample text starts as "Aa". Space and arrow shortcuts are off while editing text.
 - Export: COPY URL, DOWNLOAD .MD, CLOSE (no COPY HEX).
+- Swap keeps the same colour value active, now in its new role.
+- A level that can't be reached: the colour moves as far as it can, and the score shows the real value.
+- Figma contrast components renamed to glossary terms: `contrast controls`, `contrast method switch`, `contrast method tab`, `score`, `levels`.
 - Mobile start: photo on top, then the colour panel, with the dock pinned to the bottom. Not designed yet.
 - "Colour" for people, "color" in code (ADR 0003). Licensed fonts local-only (ADR 0002).
 

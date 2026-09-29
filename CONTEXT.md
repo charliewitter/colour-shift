@@ -2,7 +2,7 @@
 
 A one-page tool for finding colour pairings: random photos suggest a text colour and a background colour, which are scored for contrast and fine-tuned by hand.
 
-Where the Figma layer name differs from the term, it's noted as _Figma_.
+Figma layer names use these terms too.
 
 ## Colours
 
@@ -19,7 +19,7 @@ The colour behind the sample text.
 _Avoid_: BG, fill
 
 **Active colour**:
-Whichever of the two colours is selected for editing. There may be none.
+Whichever of the two colours is selected for editing. There may be none. It follows the colour value, not the role: after a swap, the same value stays active in its new role.
 _Avoid_: current colour, focused colour
 
 **Swap**:
@@ -47,19 +47,17 @@ _Avoid_: value label, tooltip
 **Contrast method**:
 The standard used to score the pair: WCAG 2 or APCA.
 _Avoid_: algorithm, algo, a11y mode
-_Figma_: a11y switch
 
 **Score**:
 The pair's contrast value under the current method, shown with its grade (`AA 5.21:1`, `Content Lc 64.3`).
 _Avoid_: rating, result
-_Figma_: a11y score
 
 **Grade**:
 The official name for a contrast band: AAA, AA, AA Large, Incidental for WCAG; Preferred Body, Body, Content, Headline, Spot for APCA; otherwise Fail.
 _Avoid_: rating, pass level
 
 **Level**:
-The threshold where a grade begins (WCAG 1.5, 3.0, 4.5, 7.0; APCA 30, 45, 60, 75, 90). Choosing one moves the active colour, or the text colour, until the pair just reaches it.
+The threshold where a grade begins (WCAG 1.5, 3.0, 4.5, 7.0; APCA 30, 45, 60, 75, 90). Choosing one moves the active colour, or the text colour, until the pair just reaches it, or as close as it can get if it can't.
 _Avoid_: threshold button, bump, target
 
 **Passing level**:

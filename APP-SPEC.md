@@ -48,7 +48,7 @@ A single-page web app for finding new colour pairings. It shows random Unsplash 
 │ ■#hex ⇄ ■#hex  WCAG|APCA  score  ← → EXPORT │
 └─────────────────────────────────────────────┘
 ```
-Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`panel=none|score|export`), `colour selectors`, `a11y module`, `export`, `font dropdown`, `font menu`, `channel readout`.
+Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`panel=none|score|export`), `colour selectors`, `contrast controls` (`contrast method switch` + `score` with its `levels`), `export`, `font dropdown`, `font menu`, `channel readout`.
 
 **Mobile (narrower than 640px).** A starting point, to be explored further. Not designed in Figma yet.
 ```
@@ -140,12 +140,12 @@ Full detail is in `COLOUR-SHIFT-STYLE-GUIDE.md`. The essentials:
 - Default: darker colour as background. Swap flips it.
 
 **Controls**
-- The slider panel only shows when fg or bg is selected. Tap fg or bg → it opens for that colour, and that picker shows its `active` state so it's clear which colour is being edited. Tap the other one → the panel switches colour and stays open. Tap the same one again → closes.
+- The slider panel only shows when fg or bg is selected. Tap fg or bg → it opens for that colour, and that picker shows its `active` state so it's clear which colour is being edited. Tap the other one → the panel switches colour and stays open. Tap the same one again → closes. Swap while a colour is active → the active selection follows the value into its new role.
 - Switching slider mode doesn't change the colour at all.
 - OKLCH chroma is capped at the maximum in-gamut value for the current lightness and hue.
 - Channel readout (e.g. `SATURATION 56.5`) is hidden by default. It shows while a slider is being dragged or keyboard-adjusted, updates live, and fades out ~1s after release.
 - Tap the score text → threshold levels open or close.
-- The highlighted level is the highest one the pair currently passes. Clicking any level moves the edited colour until the pair just reaches that level (up or down), so every level is one click away. If no colour is selected, the text (fg) colour moves.
+- The highlighted level is the highest one the pair currently passes. Clicking any level moves the edited colour until the pair just reaches that level (up or down), so every level is one click away. If no colour is selected, the text colour moves. If the level can't be reached (e.g. APCA 90 on mid-grey), the colour moves as far as it can, the score shows what it actually reached, and the passing level stays honest.
 - Tap EXPORT → export options. After an action, the label briefly confirms (`COPY URL` → `COPIED URL`).
 - The slider panel, score levels and export can all be open at the same time.
 - The clipboard falls back to an older method when the modern API is blocked.
