@@ -22,6 +22,8 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 | `--cs-border` | `#1b191a` | Dividers |
 | `--cs-text-muted` | `#a39f9f` | Default button and label text |
 | `--cs-text-strong` | `#ffffff` | Selected / active text |
+| `--cs-swatch-edge` | `#fafafa` at 30% | Swatch border (0.5px) |
+| `--cs-focus` | `#ffffff` at 30% | Keyboard focus ring |
 
 ## Typography
 
@@ -35,7 +37,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 ## Shape and spacing
 
 - **Button:** `p-2`, `rounded-[4px]`, label plus optional swatch with `gap-2`.
-- **Swatch:** 12×12px, `rounded-[2px]`, 1px inner border (white 10% on dark colours, black 10% on light).
+- **Swatch:** 12×12px, `rounded-[2px]`, 0.5px `swatch-edge` border on every colour (Figma).
 - **Photo arrows:** two sets doing the same thing. On the photo: 40×40px, `rounded-[4px]`, canvas background, 20px icon, shown on hover. In the dock: 16px ← → icons next to EXPORT.
 - **Dock:** 16px padding (`p-4`). Gaps between controls 4–16px (`gap-1` to `gap-4`).
 - **Slider:** 12px-tall row. 6px fully rounded track showing a live gradient of that channel, with a 1px inside stroke at white 15%.

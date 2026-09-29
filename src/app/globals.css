@@ -32,6 +32,8 @@
   --cs-well: #000000;
   --cs-text-muted: #a39f9f;
   --cs-text-strong: #ffffff;
+  --cs-swatch-edge: rgb(250 250 250 / 0.3); /* 0.5px swatch border (Figma) */
+  --cs-focus: rgb(255 255 255 / 0.3); /* keyboard focus ring */
 }
 
 /* ── Tailwind theme ─────────────────────────────────────────────────
@@ -50,8 +52,14 @@
   --color-well: var(--cs-well);
   --color-muted: var(--cs-text-muted);
   --color-strong: var(--cs-text-strong);
+  --color-swatch-edge: var(--cs-swatch-edge);
+  --color-focus: var(--cs-focus);
 
   --font-ui: "Input Mono", var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Plain `transition` uses the style guide's default timing. */
+  --default-transition-duration: 200ms;
+  --default-transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 /* ── Base ───────────────────────────────────────────────────────────  */

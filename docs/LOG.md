@@ -4,6 +4,34 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-09-29: Step 1 (two colours and a contrast score)
+
+**Done**
+- Step 0 committed after browser check; guided read of `globals.css`.
+- `color-engine.ts`: `getContrast` (culori WCAG, apca-w3 APCA), `getGrade`, `formatScore`, `LEVELS`. Hand-written `types/apca-w3.d.ts`.
+- State in `color-shift.tsx` (text colour, background colour, contrast method). Starting pair #ff6f91 on #3a1020 (Figma's mockup pair).
+- Colour panel painted from state. Dock per Figma `dock` (panel=none): colour pickers + swap | WCAG/APCA switch + score | empty right column.
+- `components/ui/`: button, swatch, color-picker, segmented-control, score. Swap icon downloaded from Figma to `public/icons/repeat.svg`.
+- Tokens `swatch-edge` and `focus` added; default transition timing set in `@theme`.
+- Checked: black/white = 21:1 and Lc 106.04 / -107.88. Lint, build, and browser check (user) all pass.
+- Contrast formulas note sent to the learning inbox.
+
+**Decided**
+- Levels moved to step 2: clicking a level needs the gamut/colour-mode code step 2 builds anyway.
+- Score display truncates, never rounds (4.499 must not show as a passing 4.50). Grades use the real value; APCA grades use its absolute value.
+- APCA score shows the signed Lc (negative = light text on dark).
+- Swatch border follows Figma (0.5px, white 30%, on every colour), not the old style-guide rule (1px, 10%, light/dark). Style guide updated.
+- Dock is a `1fr auto 1fr` grid so the contrast controls stay centred as the sides fill up.
+- Colour pickers are display-only until step 2 (active colour).
+
+**Loose ends**
+- None.
+
+**Next**
+- Step 2: sliders, colour modes, active colour, levels. Plan first.
+
+---
+
 ## 2026-09-29: Step 0 (project setup)
 
 **Done**
