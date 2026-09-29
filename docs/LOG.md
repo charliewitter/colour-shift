@@ -28,6 +28,7 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - A level that can't be reached: the colour moves as far as it can, and the score shows the real value.
 - Figma contrast components renamed to glossary terms: `contrast controls`, `contrast method switch`, `contrast method tab`, `score`, `levels`.
 - Mobile start: photo on top, then the colour panel, with the dock pinned to the bottom. Not designed yet.
+- UI font fallback is Geist Mono (free, and already one of the specimen fonts).
 - Teaching mode: plans explain why, each step ends with a "Worth knowing" note, I run key commands and check the browser myself, deeper topics go to the learning inbox. Explanatory output style on.
 - "Colour" for people, "color" in code (ADR 0003). Licensed fonts local-only (ADR 0002).
 

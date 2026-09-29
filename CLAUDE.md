@@ -42,7 +42,7 @@ Next.js 16, React 19, TypeScript, Tailwind v4 (config lives in `globals.css`), p
 
 - `UNSPLASH_ACCESS_KEY` in `.env.local` (never commit it or print its value)
 - Deploys to Vercel at the site root (no basePath)
-- Licensed fonts (Input Mono now; others at step 4) live in `public/fonts/`, which is gitignored. Local use only. The repo is public and the licences forbid redistribution. Always give a free fallback (JetBrains Mono for the UI). Before deploying: buy web licences and decide how the files reach Vercel.
+- Licensed fonts (Input Mono now; others at step 4) live in `public/fonts/`, which is gitignored. Local use only. The repo is public and the licences forbid redistribution. Always give a free fallback (Geist Mono for the UI). Before deploying: buy web licences and decide how the files reach Vercel.
 
 ## Architecture
 
