@@ -53,12 +53,13 @@ src/
 │   ├── page.tsx            # Renders <ColorShift /> only
 │   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + Input Mono @font-face + base styles
 ├── components/
-│   ├── color-shift.tsx     # Client component holding ALL state (text colour, background colour, contrast method)
+│   ├── color-shift.tsx     # Client component holding ALL state: colours, active colour, colour mode, contrast method. Esc handler
 │   ├── stage.tsx           # Colour panel (painted from props) + photo panel (placeholder until step 3)
+│   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
 │   ├── dock.tsx            # 3-column grid: colour pickers + swap | method switch + score | (arrows, export later)
-│   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score
+│   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, slider
 ├── lib/
-│   └── color-engine.ts     # ALL colour math: contrast (culori WCAG, apca-w3 APCA), LEVELS, grades, score text
+│   └── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, score text
 └── types/
     └── apca-w3.d.ts        # Hand-written types; apca-w3 ships none
 public/icons/               # SVG icons downloaded from Figma (committed)
@@ -68,6 +69,8 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **Input Mono** is loaded with a plain `@font-face` in `globals.css`, not `next/font/local`. `next/font/local` fails the build when the file is missing; `@font-face` just falls back to Geist Mono (ADR 0002).
 - **`AGENTS.md` must stay.** `next dev` writes its Next.js rules block into `AGENTS.md` if that file exists. Otherwise it appends the block to our `CLAUDE.md`.
 - **Score display truncates, never rounds** (4.499 shows `4.49`, not a passing-looking `4.50`). Grades use the real value; APCA grades use its absolute value.
+- **Colours are culori objects kept in the mode last edited in** (not hex). Hex is derived for display and scoring. Keeps a grey's hue and avoids 0–255 rounding while dragging. OKLCH chroma is capped at the sRGB gamut edge.
+- **Slider** = invisible native `<input type="range">` on top (drag, keys, a11y) + drawn track/grip beneath. Grip centre travels 12px in from each end to match the 24px native thumb.
 - **Colours from state** are the one allowed inline `style` colour (stage, swatch). Chrome colours always use token classes.
 - **`transition`** uses the style guide's default timing, set via `--default-transition-*` in `@theme`.
 - **pnpm** 12.6.0 via corepack, installed to `~/.local/bin` (not `/usr/local/bin`, which needs admin rights). `packageManager` in `package.json` pins the version.

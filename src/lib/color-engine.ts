@@ -1,6 +1,121 @@
 // All colour math lives here (APP-SPEC constraint). Components ask; this file answers.
-import { rgb, wcagContrast } from "culori";
+import { clampChroma, converter, displayable, formatHex, parse, rgb, wcagContrast, type Color } from "culori";
 import { APCAcontrast, sRGBtoY } from "apca-w3";
+
+export type { Color };
+
+// ── Colours ───────────────────────────────────────────────────────────
+// A colour is kept in the mode it was last edited in, at full precision.
+// Hex is only derived for display, so a grey keeps its hue and dragging
+// doesn't round to whole 0–255 steps.
+
+export function fromHex(hex: string): Color {
+  const color = parse(hex);
+  if (!color) throw new Error(`Not a colour: ${hex}`);
+  return color;
+}
+
+/** `#rrggbb`. OKLCH colours are pulled into sRGB gamut by chroma first. */
+export function toHex(color: Color): string {
+  return formatHex(color.mode === "oklch" ? clampChroma(color, "oklch") : color);
+}
+
+// ── Colour modes and channels ─────────────────────────────────────────
+
+export type ColorMode = "oklch" | "hsb" | "rgb";
+
+export type Channel = {
+  key: string; // culori property
+  label: string; // channel readout name
+  scale: number; // slider units per culori unit
+  max: number; // in slider units (OKLCH chroma's real max depends on gamut)
+  step: number;
+  decimals: number;
+};
+
+export const CHANNELS: Record<ColorMode, readonly Channel[]> = {
+  hsb: [
+    { key: "h", label: "HUE", scale: 1, max: 360, step: 0.1, decimals: 1 },
+    { key: "s", label: "SATURATION", scale: 100, max: 100, step: 0.1, decimals: 1 },
+    { key: "v", label: "BRIGHTNESS", scale: 100, max: 100, step: 0.1, decimals: 1 },
+  ],
+  oklch: [
+    { key: "l", label: "LIGHTNESS", scale: 100, max: 100, step: 0.1, decimals: 1 },
+    { key: "c", label: "CHROMA", scale: 1, max: 0.4, step: 0.001, decimals: 3 },
+    { key: "h", label: "HUE", scale: 1, max: 360, step: 0.1, decimals: 1 },
+  ],
+  rgb: [
+    { key: "r", label: "RED", scale: 255, max: 255, step: 1, decimals: 0 },
+    { key: "g", label: "GREEN", scale: 255, max: 255, step: 1, decimals: 0 },
+    { key: "b", label: "BLUE", scale: 255, max: 255, step: 1, decimals: 0 },
+  ],
+};
+
+const CULORI_MODE = { oklch: "oklch", hsb: "hsv", rgb: "rgb" } as const;
+
+// culori colours as plain records, so channels can be read and written by key.
+type Channels = Record<string, number | undefined>;
+
+function inMode(color: Color, mode: ColorMode): Channels {
+  const target = CULORI_MODE[mode];
+  if (color.mode === target) return { ...(color as unknown as Channels) };
+  return { ...(converter(target)(color) as unknown as Channels) };
+}
+
+function build(mode: ColorMode, channels: Channels): Color {
+  return { ...channels, mode: CULORI_MODE[mode] } as unknown as Color;
+}
+
+/** Channel value in slider units. An undefined hue (greys) reads as 0. */
+export function getChannel(color: Color, mode: ColorMode, channel: Channel): number {
+  return (inMode(color, mode)[channel.key] ?? 0) * channel.scale;
+}
+
+/** New colour, now stored in `mode`. OKLCH chroma is capped to the gamut edge. */
+export function setChannel(color: Color, mode: ColorMode, channel: Channel, value: number): Color {
+  const channels = inMode(color, mode);
+  channels[channel.key] = value / channel.scale;
+  if ("h" in channels) channels.h ??= 0;
+  if (mode === "oklch") {
+    channels.c = Math.min(channels.c ?? 0, maxChroma(channels.l ?? 0, channels.h ?? 0));
+  }
+  return build(mode, channels);
+}
+
+/** Slider maximum. For OKLCH chroma it's the most sRGB can show at this lightness and hue. */
+export function channelMax(color: Color, mode: ColorMode, channel: Channel): number {
+  if (mode !== "oklch" || channel.key !== "c") return channel.max;
+  const { l = 0, h = 0 } = inMode(color, "oklch");
+  return maxChroma(l, h);
+}
+
+/** CSS gradient for a slider track: this channel swept end to end, others held. */
+export function channelGradient(color: Color, mode: ColorMode, channel: Channel): string {
+  const max = channelMax(color, mode, channel);
+  const stops = Array.from({ length: 13 }, (_, i) => {
+    const swept = setChannel(color, mode, channel, (max * i) / 12);
+    return toHex(swept);
+  });
+  return `linear-gradient(to right, ${stops.join(", ")})`;
+}
+
+export function formatChannel(value: number, channel: Channel): string {
+  return value.toFixed(channel.decimals);
+}
+
+// Binary search for the largest chroma sRGB can display at this lightness and hue.
+function maxChroma(l: number, h: number): number {
+  let low = 0;
+  let high = 0.4;
+  for (let i = 0; i < 20; i++) {
+    const mid = (low + high) / 2;
+    if (displayable({ mode: "oklch", l, c: mid, h })) low = mid;
+    else high = mid;
+  }
+  return low;
+}
+
+// ── Contrast ──────────────────────────────────────────────────────────
 
 export type ContrastMethod = "wcag" | "apca";
 
@@ -16,9 +131,12 @@ const GRADES: Record<ContrastMethod, readonly string[]> = {
 };
 
 /** WCAG: ratio 1–21 (order doesn't matter). APCA: signed Lc (order matters). */
-export function getContrast(text: string, bg: string, method: ContrastMethod): number {
-  if (method === "wcag") return wcagContrast(text, bg);
-  return APCAcontrast(sRGBtoY(toRgb255(text)), sRGBtoY(toRgb255(bg)));
+export function getContrast(text: Color, bg: Color, method: ContrastMethod): number {
+  // Score what's on screen: the hex, after any gamut clamping.
+  const textHex = toHex(text);
+  const bgHex = toHex(bg);
+  if (method === "wcag") return wcagContrast(textHex, bgHex);
+  return APCAcontrast(sRGBtoY(toRgb255(textHex)), sRGBtoY(toRgb255(bgHex)));
 }
 
 /** Highest grade the value reaches, or "Fail". APCA grades ignore the sign. */
@@ -32,7 +150,7 @@ export function getGrade(value: number, method: ContrastMethod): string {
 }
 
 /** Score text for the dock: `AA 5.21:1` or `Content Lc -64.3`. */
-export function formatScore(text: string, bg: string, method: ContrastMethod): string {
+export function formatScore(text: Color, bg: Color, method: ContrastMethod): string {
   const value = getContrast(text, bg, method);
   const grade = getGrade(value, method);
   // Truncate, never round up: 4.499 must not display as a passing 4.50.
@@ -46,9 +164,9 @@ function truncate(value: number, places: number): number {
   return Math.trunc(value * factor) / factor;
 }
 
-function toRgb255(color: string): [number, number, number] {
-  const c = rgb(color);
-  if (!c) throw new Error(`Not a colour: ${color}`);
+function toRgb255(hex: string): [number, number, number] {
+  const c = rgb(hex);
+  if (!c) throw new Error(`Not a colour: ${hex}`);
   const to255 = (v: number) => Math.round(Math.min(1, Math.max(0, v)) * 255);
   return [to255(c.r), to255(c.g), to255(c.b)];
 }

@@ -4,6 +4,25 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-09-29: Step 2, part A (active colour and sliders), in progress
+
+**Done**
+- Engine: colours as culori objects in their last-edited mode; `CHANNELS` for OKLCH/HSB/RGB; `getChannel`/`setChannel`; gamut-capped OKLCH chroma (`maxChroma` binary search); live track gradients; contrast now scores the displayed hex.
+- Colour pickers are buttons with the active state; same one again closes, other switches, swap keeps the value active. Esc closes.
+- Slider panel per Figma: mode tabs (Button selected), channel readout (fades ~1s after release), three sliders with 8px grip → 24px glass on hover/drag.
+- New tokens: `text-value`, `track-edge`, `grip`, `grip-edge`, `grip-glass`, `grip-glass-edge`.
+- Checked in node: mode switch keeps hex, grey keeps hue, chroma follows gamut edge. Browser check (user) passed.
+
+**Decided**
+- Default colour mode HSB (user choice; Figma shows HSB).
+- Track gradients are live (other channels held), not Figma's pure spectrum.
+- Grip expands on hover of the whole slider row, not only the grip.
+
+**Next**
+- Part B: levels (score opens levels; clicking one moves lightness until the pair just reaches it).
+
+---
+
 ## 2026-09-29: Step 1 (two colours and a contrast score)
 
 **Done**
