@@ -18,7 +18,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 | `--cs-surface` | `#1a1718` | Panels |
 | `--cs-surface-raised` | `#262626` | Hover and selected button fill |
 | `--cs-stroke` | `#3e3e3e` at 80% | Selected / pressed button outline (1px, outside) |
-| `--cs-well` | `#000000` | Recessed groups: WCAG/APCA switch, threshold buttons |
+| `--cs-well` | `#000000` | Recessed groups: contrast method switch, level buttons |
 | `--cs-border` | `#1b191a` | Dividers |
 | `--cs-text-muted` | `#a39f9f` | Default button and label text |
 | `--cs-text-strong` | `#ffffff` | Selected / active text |
@@ -26,7 +26,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 ## Typography
 
 - **UI font:** Input Mono, 12px (`text-xs`), `leading-none`. 14px on mobile.
-- **Labels are UPPERCASE:** `EXPORT`, `COPY URL`, `DOWNLOAD .MD`, `CLOSE`, `OKLCH`, `HUE`. No FG/BG labels; the swatch + hex speaks for itself.
+- **Labels are UPPERCASE:** `EXPORT`, `COPY URL`, `DOWNLOAD .MD`, `CLOSE`, `OKLCH`, `HUE`. No labels on the colour pickers; the swatch + hex speaks for itself.
 - **Score text keeps the case the contrast check returns** (`Content Lc 74.9`, `AA Large 4.45:1`). It's data, not a label.
 - **Numbers** use tabular figures so scores don't jiggle.
 - **Sample text:** the chosen specimen font, `leading-[1.05]`, `tracking-tight`, centred.

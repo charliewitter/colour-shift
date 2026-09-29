@@ -8,7 +8,7 @@ A one-page web app for **finding new colour pairings**. It shows a stream of ran
 
 ## What it does
 
-1. **Photo stream.** It loads random Unsplash photos across a wide spread of subjects, using a rotating list of search terms like MDS's. You move between photos with on-screen arrows (on the photo and in the control bar) and the keyboard arrow keys, and the space bar jumps to a new random photo. Each photo shows the photographer's credit, which Unsplash's rules require.
+1. **Photo stream.** It loads random Unsplash photos across a wide spread of subjects, using a rotating list of search terms like MDS's. You move between photos with on-screen arrows (on the photo and in the dock) and the keyboard arrow keys, and the space bar jumps to a new random photo. Each photo shows the photographer's credit, which Unsplash's rules require.
 2. **Automatic pairing.** Each photo's palette is analysed in the browser, and a strong background colour and text colour are picked from it.
 3. **Colour panel.** The pair appears next to the photo, with sample text you can type into. You can choose from the same seven fonts MDS uses (Geist, Geist Mono, Instrument Serif, Alpha Lyrae, Departure Mono, Ghost Byte, Input Mono). I'll handle their licences myself.
 4. **Contrast score.** The score is always visible, with a switch between **WCAG** and **APCA**, and it shows whether the pair passes. Clicking it shows every threshold level; clicking a level moves the colour to reach it.
@@ -19,7 +19,7 @@ A one-page web app for **finding new colour pairings**. It shows a stream of ran
 
 ## Look and feel
 
-- **It matches MDS's visual design**: his dark interface, the colour panel next to the photo, and the control bar along the bottom.
+- **It matches MDS's visual design**: his dark interface, the colour panel next to the photo, and the dock (control bar) along the bottom.
 - **Desktop and mobile both get proper layouts**, arranged the way his are.
 - **Motion stays simple.** Smooth CSS transitions everywhere and no GSAP, which avoids the fragile part of his build.
 

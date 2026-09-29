@@ -35,9 +35,9 @@ A single-page web app for finding new colour pairings. It shows random Unsplash 
 ┌──────────────────────┬──────────────────────┐
 │ [FONT ▾]             │                      │
 │   Colour panel       │   Photo panel        │
-│   bg colour +        │   Unsplash photo,    │
-│   sample text in     │   arrows on hover,   │
-│   fg colour          │   credit bottom-right│
+│   background colour  │   Unsplash photo,    │
+│   + sample text in   │   arrows on hover,   │
+│   text colour        │   credit bottom-right│
 ├──────────────────────┴──────────────────────┤
 │ Slider panel (opens upward, pushes stage up)│
 │ OKLCH HSB RGB              [channel readout]│
@@ -45,7 +45,7 @@ A single-page web app for finding new colour pairings. It shows random Unsplash 
 │ ━━━━━━━━━━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━━━━ │
 │ ━━━━━━━━━━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━━━━ │
 ├─────────────────────────────────────────────┤
-│ ■FG ⇄ ■BG   WCAG|APCA  score   ← → EXPORT   │
+│ ■#hex ⇄ ■#hex  WCAG|APCA  score  ← → EXPORT │
 └─────────────────────────────────────────────┘
 ```
 Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`panel=none|score|export`), `colour selectors`, `a11y module`, `export`, `font dropdown`, `font menu`, `channel readout`.
@@ -69,11 +69,11 @@ Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`pane
 **On screen:**
 - **Colour panel:** background colour, with editable sample text in the fg colour. Starts as "Aa"; empty text shows "Aa". Font dropdown top-left.
 - **Photo panel:** current photo, previous/next arrows on hover, and the photographer credit linking to Unsplash.
-- **Dock:** fg picker (swatch + hex), swap button, bg picker (swatch + hex) · WCAG/APCA switch, threshold levels (when open), score · ← → photo arrows (same as the photo-panel arrows), EXPORT. No FG/BG labels.
+- **Dock:** text colour picker (swatch + hex), swap button, background colour picker (swatch + hex) · contrast method switch (WCAG/APCA), levels (when open), score · ← → photo arrows (same as the photo-panel arrows), EXPORT. No text labels on the pickers.
 - **Slider panel:** OKLCH / HSB / RGB tabs, channel readout, three sliders. No CLOSE button.
 - **Export (in dock):** COPY URL, DOWNLOAD .MD, CLOSE.
 
-**Contrast grades.** Each level is a threshold button (WCAG `1.5 3.0 4.5 7.0`, APCA `30 45 60 75 90`).
+**Contrast grades.** Each level is a button (WCAG `1.5 3.0 4.5 7.0`, APCA `30 45 60 75 90`).
 
 | WCAG 2 (ratio) | Grade |
 |---|---|

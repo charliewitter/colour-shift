@@ -1,6 +1,6 @@
 # Colour Shift
 
-One-page web app for finding new colour pairings from random Unsplash photos, with contrast scoring and slider fine-tuning. Full spec: `SPEC.md` (what to build). Build rules + behaviour: `APP-SPEC.md`. Look + motion: `COLOUR-SHIFT-STYLE-GUIDE.md`. Read all three before planning any work.
+One-page web app for finding new colour pairings from random Unsplash photos, with contrast scoring and slider fine-tuning. Full spec: `SPEC.md` (what to build). Build rules + behaviour: `APP-SPEC.md`. Look + motion: `COLOUR-SHIFT-STYLE-GUIDE.md`. Read all three before planning any work. Also read `CONTEXT.md` (glossary: use its terms in docs and code), the top entry of `docs/LOG.md` (latest handoff), and `docs/adr/` (decisions and why).
 
 Design: [Figma, Colour Shift](https://www.figma.com/design/IFKpGTC3reLa2GWP6go6KH/Colour-Shift?node-id=0-1). Source of truth for desktop visuals; wins over the style guide where they differ. Mockup contrast values are illustrative only. Mobile not designed yet.
 
@@ -16,6 +16,8 @@ When reporting information to me, be extremely concise and sacrifice grammar for
 - Build one step at a time, following the build order in `SPEC.md`. Check each step in the browser before moving on.
 - Make small commits with clear messages (`feat:`, `fix:`, `style:`, `docs:`).
 - Keep this file current. Update it when a decision is made or the structure changes.
+- End of each step or session: add an entry to the top of `docs/LOG.md` (done, decided, loose ends, next) in the same commit as the work.
+- New term, or a term used inconsistently → update `CONTEXT.md` straight away. Hard-to-reverse, surprising trade-off → new ADR in `docs/adr/`.
 
 ## Stack
 
