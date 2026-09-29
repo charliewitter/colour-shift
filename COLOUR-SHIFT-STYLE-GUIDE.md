@@ -16,11 +16,12 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 |---|---|---|
 | `--cs-canvas` | `#0f0e0f` | Page background, dock, photo arrows |
 | `--cs-surface` | `#1a1718` | Panels |
-| `--cs-surface-raised` | `#212121` | Hover and selected button fill |
-| `--cs-stroke` | `#303030` | Selected button inset outline (1px) |
+| `--cs-surface-raised` | `#262626` | Hover and selected button fill |
+| `--cs-stroke` | `#3e3e3e` at 80% | Selected / pressed button outline (1px, outside) |
+| `--cs-well` | `#000000` | Recessed groups: WCAG/APCA switch, threshold buttons |
 | `--cs-border` | `#1b191a` | Dividers |
 | `--cs-text-muted` | `#a39f9f` | Default button and label text |
-| `--cs-text-strong` | `#e5e0e0` | Selected / active text |
+| `--cs-text-strong` | `#ffffff` | Selected / active text |
 
 ## Typography
 
@@ -37,7 +38,11 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 - **Swatch:** 12×12px, `rounded-[2px]`, 1px inner border (white 10% on dark colours, black 10% on light).
 - **Photo arrows:** two sets doing the same thing. On the photo: 40×40px, `rounded-[4px]`, canvas background, 20px icon, shown on hover. In the dock: 16px ← → icons next to EXPORT.
 - **Dock:** 16px padding (`p-4`). Gaps between controls 4–16px (`gap-1` to `gap-4`).
-- **Slider:** 6px rounded track showing a live gradient of that channel, 12px round white grip.
+- **Slider:** 12px-tall row. 6px fully rounded track showing a live gradient of that channel, with a 1px inside stroke at white 15%.
+- **Grip** (Figma `grip`, `expanded=false|true`): a 24×24px hit area centred on the track.
+  - **Rest:** 8px white dot with a 1px white-10% inside stroke.
+  - **Expanded** (on hover and while dragging): 24px circle, white 20% fill, 1px white-40% stroke, glass effect (Figma GLASS, radius 3). In CSS this is approximated with `backdrop-filter` blur, since Figma's refraction can't be matched exactly.
+- **Slider panel:** canvas fill, 1px `border` divider, 16px padding all round. 16px gap between the mode row and the sliders, 20px gap between sliders. The mode row puts the tabs on the left and the channel readout on the right.
 - **Radius:** 4px everywhere, except swatches (2px) and fully round items.
 
 ## Button states
@@ -45,9 +50,10 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 | State | Look |
 |---|---|
 | Default | Transparent, muted text |
-| Hover | `surface-raised` fill |
-| Selected | `surface-raised` fill + 1px inset `stroke` outline + strong text |
-| Pressed | Scales to 0.95, pops back |
+| Hover | `surface-raised` fill, muted text |
+| Pressed (Figma `active`) | `surface-raised` fill + 1px outside `stroke` outline, muted text; scales to 0.95, pops back |
+| Selected | `surface-raised` fill + 1px outside `stroke` outline + strong text |
+| Segment selected (WCAG/APCA switch) | `surface-raised` fill + strong text, no outline, inside a `well` track |
 | Focus (keyboard) | 1px ring, white 30% |
 
 ## Motion
