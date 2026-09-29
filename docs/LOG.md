@@ -4,6 +4,36 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-09-29: Step 0 (project setup)
+
+**Done**
+- pnpm 12.6.0 installed via corepack into `~/.local/bin` (`/usr/local/bin` gave a permissions error).
+- Next 16.3.7 generated in a temporary folder, then merged in without touching our docs. The temporary folder is deleted.
+- Tokens, `@theme` mapping and base styles in `globals.css`. Input Mono via `@font-face`, Geist Mono fallback via `next/font/google`.
+- `color-shift.tsx` → `stage.tsx` (50/50 grey placeholders, "Aa") + `dock.tsx` (56px, empty). Title "Colour Shift". Starter SVGs and favicon removed.
+- `pnpm lint` and `pnpm build` both pass. The token classes are in the built CSS, and the default Tailwind palette is gone.
+- CLAUDE.md Architecture section filled in.
+- Browser check passed (user): 50/50 halves, 56px dock, no scrollbars, tab title, Input Mono rendering.
+
+**Decided**
+- Input Mono uses a plain `@font-face`, not `next/font/local`, which would fail the build without the licensed file.
+- Keep `AGENTS.md`: `next dev` otherwise writes into our CLAUDE.md.
+- Tailwind's default colour palette removed (`--color-*: initial`), so only tokens exist.
+- Text token classes are `text-muted` / `text-strong`, mapped from `--cs-text-muted` / `--cs-text-strong`.
+- Geist Sans dropped for now; it returns as a specimen font in step 4.
+
+**Loose ends**
+- `pnpm dev` from Claude's `!` shell runs in the background; prefer a separate terminal tab. Next 16 refuses a second dev server for the same folder.
+
+**Not yet done (pick up here)**
+1. Guided read of `src/app/globals.css` with the user (teaching checkpoint).
+2. Then a Tailwind `/teach` session (the note is in `~/GitHub/learning/inbox`). A TypeScript note is also there for after step 1.
+
+**Next**
+- Step 1: two colours and a contrast score. Plan first.
+
+---
+
 ## 2026-09-28 → 29: Figma review and doc alignment
 
 **Done**

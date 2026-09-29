@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* ── Fonts ──────────────────────────────────────────────────────────
+   Input Mono is licensed and local-only (docs/adr/0002). The files live in
+   the gitignored public/fonts/. If they're missing, the browser falls back
+   to Geist Mono, loaded in layout.tsx as --font-geist-mono. */
+
+@font-face {
+  font-family: "Input Mono";
+  src: url("/fonts/InputMono-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Input Mono";
+  src: url("/fonts/InputMono-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ── Tokens ─────────────────────────────────────────────────────────
+   Source of truth: COLOUR-SHIFT-STYLE-GUIDE.md (Figma wins, docs/adr/0001).
+   Change a value here and every component using it updates. */
+
+:root {
+  --cs-canvas: #0f0e0f;
+  --cs-surface: #1a1718;
+  --cs-surface-raised: #262626;
+  --cs-stroke: rgb(62 62 62 / 0.8); /* #3e3e3e at 80% */
+  --cs-border: #1b191a;
+  --cs-well: #000000;
+  --cs-text-muted: #a39f9f;
+  --cs-text-strong: #ffffff;
+}
+
+/* ── Tailwind theme ─────────────────────────────────────────────────
+   Maps tokens to utility classes: bg-canvas, bg-surface, border-stroke,
+   text-muted, text-strong… The first line removes Tailwind's default
+   palette, so only our tokens exist as colour classes and raw colours
+   like bg-zinc-50 can't creep in. */
+
+@theme inline {
+  --color-*: initial;
+  --color-canvas: var(--cs-canvas);
+  --color-surface: var(--cs-surface);
+  --color-surface-raised: var(--cs-surface-raised);
+  --color-stroke: var(--cs-stroke);
+  --color-border: var(--cs-border);
+  --color-well: var(--cs-well);
+  --color-muted: var(--cs-text-muted);
+  --color-strong: var(--cs-text-strong);
+
+  --font-ui: "Input Mono", var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────  */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--cs-canvas);
+  color: var(--cs-text-muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+  overflow: hidden;
+}

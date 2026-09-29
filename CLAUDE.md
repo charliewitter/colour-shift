@@ -46,4 +46,19 @@ Next.js 16, React 19, TypeScript, Tailwind v4 (config lives in `globals.css`), p
 
 ## Architecture
 
-Not built yet. Fill in as it takes shape.
+```
+src/
+├── app/
+│   ├── layout.tsx        # Root layout: metadata (title "Colour Shift"), Geist Mono fallback font
+│   ├── page.tsx          # Renders <ColorShift /> only
+│   └── globals.css       # Tailwind v4 + tokens (--cs-*) + @theme mapping + Input Mono @font-face + base styles
+└── components/
+    ├── color-shift.tsx   # Top-level component: stage + dock in a full-height column. All state goes here (step 1+)
+    ├── stage.tsx         # Colour panel + photo panel, 50/50 (placeholders in step 0)
+    └── dock.tsx          # 56px bar pinned to the bottom (empty in step 0)
+```
+
+- **Tokens:** `--cs-*` in `:root` are the source of truth. `@theme inline` maps them to classes (`bg-canvas`, `bg-surface`, `bg-surface-raised`, `bg-well`, `border-stroke`, `border-border`, `text-muted`, `text-strong`, `font-ui`). `--color-*: initial` removes Tailwind's default palette, so only token colours exist.
+- **Input Mono** is loaded with a plain `@font-face` in `globals.css`, not `next/font/local`. `next/font/local` fails the build when the file is missing; `@font-face` just falls back to Geist Mono (ADR 0002).
+- **`AGENTS.md` must stay.** `next dev` writes its Next.js rules block into `AGENTS.md` if that file exists. Otherwise it appends the block to our `CLAUDE.md`.
+- **pnpm** 12.6.0 via corepack, installed to `~/.local/bin` (not `/usr/local/bin`, which needs admin rights). `packageManager` in `package.json` pins the version.
