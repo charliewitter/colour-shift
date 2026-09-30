@@ -33,7 +33,7 @@
   --cs-text-muted: #a39f9f;
   --cs-text-strong: #ffffff;
   --cs-swatch-edge: rgb(250 250 250 / 0.3); /* 0.5px swatch border (Figma) */
-  --cs-focus: rgb(255 255 255 / 0.3); /* keyboard focus ring */
+  --cs-focus: rgb(255 255 255 / 0.2); /* keyboard focus ring */
   --cs-text-value: #e5e0e0; /* channel readout value */
 
   /* Sliders */

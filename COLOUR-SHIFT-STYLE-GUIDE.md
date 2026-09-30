@@ -23,7 +23,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 | `--cs-text-muted` | `#a39f9f` | Default button and label text |
 | `--cs-text-strong` | `#ffffff` | Selected / active text |
 | `--cs-swatch-edge` | `#fafafa` at 30% | Swatch border (0.5px) |
-| `--cs-focus` | `#ffffff` at 30% | Keyboard focus ring |
+| `--cs-focus` | `#ffffff` at 20% | Keyboard focus ring |
 
 ## Typography
 
@@ -56,7 +56,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 | Pressed (Figma `active`) | `surface-raised` fill + 1px outside `stroke` outline, muted text; scales to 0.95, pops back |
 | Selected | `surface-raised` fill + 1px outside `stroke` outline + strong text |
 | Segment selected (WCAG/APCA switch) | `surface-raised` fill + strong text, no outline, inside a `well` track |
-| Focus (keyboard) | 1px ring, white 30% |
+| Focus (keyboard) | 1px ring, white 20% |
 
 ## Motion
 
