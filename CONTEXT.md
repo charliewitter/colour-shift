@@ -129,5 +129,5 @@ The dock control for keeping a pair: copy the share link, or download the Markdo
 _Avoid_: share menu, save
 
 **Share link**:
-A URL that reopens the same photo, pair, contrast method, swap state and sample text.
+A URL that reopens the same photo, pair, contrast method, specimen font and sample text.
 _Avoid_: permalink, deep link

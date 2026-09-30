@@ -213,6 +213,48 @@ export function formatScore(text: Color, bg: Color, method: ContrastMethod): str
     : `${grade} Lc ${truncate(value, 1).toFixed(1)}`;
 }
 
+// ── Export ────────────────────────────────────────────────────────────
+
+const METHOD_NAMES: Record<ContrastMethod, string> = { wcag: "WCAG 2", apca: "APCA" };
+
+/** The pair as a Markdown file (CONTEXT.md: Export): both colours, the score, the share link, the credit. */
+export function exportMarkdown({
+  colors,
+  method,
+  shareUrl,
+  credit,
+}: {
+  colors: Pair;
+  method: ContrastMethod;
+  shareUrl: string;
+  credit: { photographer: string; photographerUrl: string; photoUrl: string } | null;
+}): string {
+  const row = (name: string, color: Color) => {
+    // From the hex, so every value describes the colour on screen (after gamut clamping).
+    const hex = toHex(color);
+    const [r, g, b] = toRgb255(hex);
+    const { l = 0, c = 0, h = 0 } = inMode(fromHex(hex), "oklch");
+    const oklch = `oklch(${(l * 100).toFixed(1)}% ${c.toFixed(3)} ${h.toFixed(1)})`;
+    return `| ${name} | \`${hex.toUpperCase()}\` | \`rgb(${r} ${g} ${b})\` | \`${oklch}\` |`;
+  };
+  return [
+    "# Colour Shift pair",
+    "",
+    "| | Hex | RGB | OKLCH |",
+    "| --- | --- | --- | --- |",
+    row("Text", colors.text),
+    row("Background", colors.bg),
+    "",
+    `**Contrast (${METHOD_NAMES[method]}):** ${formatScore(colors.text, colors.bg, method)}`,
+    "",
+    `**Share link:** ${shareUrl}`,
+    ...(credit
+      ? ["", `Photo by [${credit.photographer}](${credit.photographerUrl}) on [Unsplash](${credit.photoUrl})`]
+      : []),
+    "",
+  ].join("\n");
+}
+
 // ── Pairing from a photo ──────────────────────────────────────────────
 
 /** A colour found in a photo (CONTEXT.md: Photo colour), with how many pixels it covers. */

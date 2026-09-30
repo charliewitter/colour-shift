@@ -5,6 +5,7 @@ import { Dock } from "@/components/dock";
 import { SliderPanel } from "@/components/slider-panel";
 import { Stage } from "@/components/stage";
 import {
+  exportMarkdown,
   fromHex,
   reachLevel,
   toHex,
@@ -15,6 +16,8 @@ import {
   type Role,
 } from "@/lib/color-engine";
 import { DEFAULT_FONT, type SpecimenFontId } from "@/lib/fonts";
+import { copyText, downloadText } from "@/lib/export";
+import { shareQuery } from "@/lib/share";
 import { extractPair, fetchRandomPhotos, preloadPhoto, trackDownload } from "@/lib/photos";
 import type { Photo } from "@/types/photo";
 
@@ -56,6 +59,7 @@ export function ColorShift() {
   const [sampleText, setSampleText] = useState("Aa");
   const [font, setFont] = useState<SpecimenFontId>(DEFAULT_FONT);
   const [fontMenuOpen, setFontMenuOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   // The photo stream, in order, and which one is showing. ← walks back; the rest are loaded ahead.
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [photoIndex, setPhotoIndex] = useState(0);
@@ -140,6 +144,7 @@ export function ColorShift() {
       setActiveRole(null);
       setLevelsOpen(false);
       setFontMenuOpen(false);
+      setExportOpen(false);
       return;
     }
     if (event.metaKey || event.ctrlKey || event.altKey || isTyping(event.target)) return;
@@ -229,6 +234,18 @@ export function ColorShift() {
     setPhotoIndex(at + 1);
   }
 
+  // The link that reopens what's on screen (CONTEXT.md: Share link). Built on demand; the
+  // address bar is never touched.
+  function shareUrl(): string {
+    const query = shareQuery({ photoId: photo?.id ?? null, colors, method: contrastMethod, font, text: sampleText });
+    return `${window.location.origin}/?${query}`;
+  }
+
+  function downloadMarkdown() {
+    const markdown = exportMarkdown({ colors, method: contrastMethod, shareUrl: shareUrl(), credit: photo });
+    downloadText(`colour-shift-${toHex(colors.text).slice(1)}-${toHex(colors.bg).slice(1)}.md`, markdown);
+  }
+
   const textHex = toHex(colors.text);
   const bgHex = toHex(colors.bg);
 
@@ -273,6 +290,10 @@ export function ColorShift() {
         onContrastMethodChange={setContrastMethod}
         onPreviousPhoto={previousPhoto}
         onNextPhoto={nextPhoto}
+        exportOpen={exportOpen}
+        onToggleExport={() => setExportOpen((open) => !open)}
+        onCopyUrl={() => copyText(shareUrl())}
+        onDownload={downloadMarkdown}
       />
     </main>
   );

@@ -71,7 +71,7 @@ Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`pane
 - **Photo panel:** current photo, previous/next arrows on hover, and the photographer credit linking to Unsplash.
 - **Dock:** text colour picker (swatch + hex), swap button, background colour picker (swatch + hex) · contrast method switch (WCAG/APCA), levels (when open), score · ← → photo arrows (same as the photo-panel arrows), EXPORT. No text labels on the pickers.
 - **Slider panel:** OKLCH / HSB / RGB tabs, channel readout, three sliders. No CLOSE button.
-- **Export (in dock):** COPY URL, DOWNLOAD .MD, CLOSE.
+- **Export (in dock):** EXPORT opens COPY URL, DOWNLOAD .MD, CLOSE (CLOSE in the selected style), replacing EXPORT.
 
 **Contrast grades.** Each level is a button (WCAG `1.5 3.0 4.5 7.0`, APCA `30 45 60 75 90`).
 
@@ -97,7 +97,7 @@ Labels follow the official terms: WCAG 2 SC 1.4.3 / 1.4.6, and APCA Bronze Simpl
 The score shows the grade and the value, taken from the contrast check: `AA 5.21:1` or `Content Lc 64.3`. Mixed case on purpose (data, not a label). The Figma mockup values are illustrative, not accurate; the build uses real scores.
 
 **Exports**
-- **Share URL:** `/?photo=<id>&bg=<hex>&fg=<hex>&algo=wcag|apca&swap=1&text=<text>`
+- **Share URL:** `/?photo=<id>&fg=<hex>&bg=<hex>&algo=apca&font=<id>&text=<text>`. Hex without `#`. Values at their default (WCAG, Departure Mono, "Aa") are left out. No `swap`: swap exchanges the colours themselves, so `fg`/`bg` already say which is which. Built only when copied; the address bar is never updated.
 - **Markdown file:** both colours (hex, RGB, OKLCH), score and grade for the active method, share URL, photo credit.
 
 ---
@@ -146,12 +146,12 @@ Full detail is in `COLOUR-SHIFT-STYLE-GUIDE.md`. The essentials:
 - Channel readout (e.g. `SATURATION 56.5`) is hidden by default. It shows while a slider is being dragged or keyboard-adjusted, updates live, and fades out ~1s after release.
 - Tap the score text → threshold levels open or close.
 - The highlighted level is the highest one the pair currently passes. Clicking any level moves the edited colour until the pair just reaches that level (up or down), so every level is one click away. If no colour is selected, the text colour moves. If the level can't be reached (e.g. APCA 90 on mid-grey), the colour moves as far as it can, the score shows what it actually reached, and the passing level stays honest.
-- Tap EXPORT → export options. After an action, the label briefly confirms (`COPY URL` → `COPIED URL`).
+- Tap EXPORT → export options. After an action, the label briefly confirms (`COPY URL` → `COPIED`, `DOWNLOAD .MD` → `DOWNLOADED`), without changing width.
 - The slider panel, score levels and export can all be open at the same time.
 - The clipboard falls back to an older method when the modern API is blocked.
 
 **Share links**
-- Opening a share URL restores the photo, colours, contrast method, swap state and sample text, then fills the buffer with random photos.
+- Opening a share URL restores the photo, colours, contrast method, specimen font and sample text, then fills the buffer with random photos.
 
 **Keyboard**
 - ← → : previous / next photo (same as both sets of on-screen arrows). Ignored while editing text.

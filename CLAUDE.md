@@ -59,10 +59,12 @@ src/
 │   ├── sample-text.tsx     # Editable sample text: plaintext contentEditable (uncontrolled), shrink to fit, 100 chars, "Aa" placeholder
 │   ├── photo-panel.tsx     # Photo layers (leaving + current) that slide, blurred preview under each, credit, hover arrows
 │   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
-│   ├── dock.tsx            # 2 halves: pickers + swap … method switch | centre | levels + score … photo arrows (export later)
+│   ├── dock.tsx            # 2 halves: pickers + swap … method switch | centre | levels + score … photo arrows + export (EXPORT ⇄ COPY URL, DOWNLOAD .MD, CLOSE)
 │   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider, dropdown
 ├── lib/
-│   ├── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text, pickPair
+│   ├── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text, exportMarkdown, pickPair
+│   ├── share.ts            # Share link: shareQuery (defaults left out)
+│   ├── export.ts           # Browser side of export: copyText (execCommand fallback), downloadText (Blob)
 │   ├── fonts.ts            # The 7 specimen fonts: id, label, CSS family with free fallback. Default Departure Mono
 │   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing (photoSrc, previewSrc), preloadPhoto, download tracking, extractPair (node-vibrant, lazy-loaded)
 └── types/
@@ -93,6 +95,8 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **Specimen fonts:** free ones via `next/font/google` (hosted with the site, no layout shift); licensed ones via plain `@font-face` so a missing file falls back instead of failing the build. `lib/fonts.ts` joins both into one list. Licensed monos fall back to Geist Mono, Alpha Lyrae to Geist. opentype.js dropped: the reference only used it for social preview images (out of scope).
 - **Dropdown** (`ui/dropdown.tsx`, Figma `font dropdown` + `font menu`): open state lives in `color-shift` (Esc closes it with the other panels). Outside pointerdown closes; ↑ ↓ wrap through `menuitemradio`s; choosing or Esc returns focus to the trigger. Opens with `starting:` (@starting-style) fade + 4px drop; closes instantly.
 - **Sample text** (`sample-text.tsx`): uncontrolled `contentEditable="plaintext-only"`; React never renders its children (caret stays put), `onInput` copies text to state, a layout effect copies state in only when it differs (share links). Shrink to fit: binary search 96→16px inside the panel inset 64px, written to `style.fontSize` (a measurement, not state), re-run on text/font/resize/`document.fonts` loadingdone; at 16px a too-long word breaks anywhere. Enter/Esc blur. Selection tint via `--sample-color` + `color-mix`. No focus ring: the caret is the focus state.
+- **Export:** `exportOpen` state in `color-shift` (Esc closes). Confirmation labels are local to `ExportControls` (visual-only), 1.5s, and reserve the longest label's width (`StableLabel`). Focus moves to COPY URL on open, back to EXPORT on close. Share URL built on demand from state; Markdown text in `color-engine` (colour formatting), read from on-screen hex.
+- **Slider track** uses `bg-origin-border`: otherwise the gradient is sized inside the 1px border and repeats under it.
 - **Photo requests go through `requestPhotos`** in `color-shift.tsx`: returns `null` when skipped (one in flight), `[]` when failed. If the first batch fails, `FALLBACK_COLORS` (muted on surface) fade in, only if nothing has set colours yet. Failures `console.warn` (errors pop Next's dev overlay). A ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo; ~6 calls at start-up).
 - **Run `pnpm dev` in its own Terminal**, not via `! pnpm dev`: Claude Code moves long `!` commands to the background and stops them when memory runs low.
 - **pnpm** 12.6.0 via corepack, installed to `~/.local/bin` (not `/usr/local/bin`, which needs admin rights). `packageManager` in `package.json` pins the version.

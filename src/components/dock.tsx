@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Levels } from "@/components/ui/levels";
@@ -33,6 +34,11 @@ type DockProps = {
   onContrastMethodChange: (method: ContrastMethod) => void;
   onPreviousPhoto: () => void;
   onNextPhoto: () => void;
+  exportOpen: boolean;
+  onToggleExport: () => void;
+  /** Resolves true if the link reached the clipboard. */
+  onCopyUrl: () => Promise<boolean>;
+  onDownload: () => void;
 };
 
 // The bar pinned to the bottom (CONTEXT.md: Dock), laid out as Figma `dock`.
@@ -50,6 +56,10 @@ export function Dock({
   onContrastMethodChange,
   onPreviousPhoto,
   onNextPhoto,
+  exportOpen,
+  onToggleExport,
+  onCopyUrl,
+  onDownload,
 }: DockProps) {
   const contrast = getContrast(colors.text, colors.bg, contrastMethod);
 
@@ -93,16 +103,95 @@ export function Dock({
         <Score open={levelsOpen} onClick={onToggleLevels}>
           {formatScore(colors.text, colors.bg, contrastMethod)}
         </Score>
-        {/* Figma `photo arrows`, pushed right. Export (step 5) goes after them. */}
-        <div className="ml-auto flex items-center gap-2">
-          <Button icon aria-label="Previous photo" onClick={onPreviousPhoto}>
-            <Image src="/icons/arrow-left.svg" alt="" width={16} height={16} />
-          </Button>
-          <Button icon aria-label="Next photo" onClick={onNextPhoto}>
-            <Image src="/icons/arrow-right.svg" alt="" width={16} height={16} />
-          </Button>
+        {/* Figma `export`, pushed right: photo arrows, then EXPORT or its options. */}
+        <div className="ml-auto flex items-center gap-[7px]">
+          <div className="flex items-center gap-2">
+            <Button icon aria-label="Previous photo" onClick={onPreviousPhoto}>
+              <Image src="/icons/arrow-left.svg" alt="" width={16} height={16} />
+            </Button>
+            <Button icon aria-label="Next photo" onClick={onNextPhoto}>
+              <Image src="/icons/arrow-right.svg" alt="" width={16} height={16} />
+            </Button>
+          </div>
+          <ExportControls open={exportOpen} onToggle={onToggleExport} onCopyUrl={onCopyUrl} onDownload={onDownload} />
         </div>
       </div>
     </footer>
+  );
+}
+
+type Done = "copy" | "download" | null;
+
+// EXPORT, or once open: COPY URL, DOWNLOAD .MD, CLOSE (Figma `export`). After an action its
+// label confirms for 1.5s (COPIED, DOWNLOADED). Focus moves to COPY URL on open and back
+// to EXPORT on close, so keyboard users aren't dropped when the buttons swap.
+function ExportControls({
+  open,
+  onToggle,
+  onCopyUrl,
+  onDownload,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  onCopyUrl: () => Promise<boolean>;
+  onDownload: () => void;
+}) {
+  const [done, setDone] = useState<Done>(null);
+  const timer = useRef<number>(undefined);
+  const exportButton = useRef<HTMLButtonElement>(null);
+  const copyButton = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(open);
+
+  useEffect(() => {
+    if (open) copyButton.current?.focus();
+    else if (wasOpen.current) exportButton.current?.focus();
+    wasOpen.current = open;
+  }, [open]);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  function confirm(action: Done) {
+    setDone(action);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setDone(null), 1500);
+  }
+
+  if (!open) {
+    return (
+      <Button ref={exportButton} aria-expanded={false} onClick={onToggle}>
+        EXPORT
+      </Button>
+    );
+  }
+
+  return (
+    <>
+      <Button ref={copyButton} onClick={async () => (await onCopyUrl()) && confirm("copy")}>
+        <StableLabel label={done === "copy" ? "COPIED" : "COPY URL"} longest="COPY URL" />
+      </Button>
+      <Button
+        onClick={() => {
+          onDownload();
+          confirm("download");
+        }}
+      >
+        <StableLabel label={done === "download" ? "DOWNLOADED" : "DOWNLOAD .MD"} longest="DOWNLOAD .MD" />
+      </Button>
+      <Button selected aria-expanded onClick={onToggle}>
+        CLOSE
+      </Button>
+    </>
+  );
+}
+
+// Reserves the longest label's width, so confirming doesn't nudge the buttons beside it.
+function StableLabel({ label, longest }: { label: string; longest: string }) {
+  return (
+    <span className="grid" aria-live="polite">
+      <span className="invisible col-start-1 row-start-1" aria-hidden>
+        {longest}
+      </span>
+      <span className="col-start-1 row-start-1">{label}</span>
+    </span>
   );
 }
