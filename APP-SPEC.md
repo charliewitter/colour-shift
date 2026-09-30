@@ -10,7 +10,7 @@ Reference project: `../color-shift` (by MDS). Use it for reference only; don't c
 
 A single-page web app for finding new colour pairings. It shows random Unsplash photos, extracts a background/text pair from each one, scores the pair's contrast, and lets you fine-tune, share, and export it.
 
-**Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4 (config in `globals.css`), pnpm. Colour libraries: culori (conversions), apca-w3 (APCA), node-vibrant (palette extraction), opentype.js (specimen fonts).
+**Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4 (config in `globals.css`), pnpm. Colour libraries: culori (conversions), apca-w3 (APCA), node-vibrant (palette extraction). Specimen fonts load via `next/font/google` and `@font-face`; opentype.js isn't needed.
 
 **Hosting:** Vercel, at the site root. `UNSPLASH_ACCESS_KEY` in `.env.local` locally and in Vercel env vars.
 

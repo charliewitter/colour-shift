@@ -19,6 +19,27 @@
   font-display: swap;
 }
 
+/* Specimen fonts, licensed like Input Mono: local-only, each with a free
+   fallback in src/lib/fonts.ts. One face each, used at the normal weight. */
+
+@font-face {
+  font-family: "Departure Mono";
+  src: url("/fonts/DepartureMono-Regular.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Alpha Lyrae";
+  src: url("/fonts/AlphaLyrae-Medium.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ghost Byte";
+  src: url("/fonts/GhostByte-Regular.woff") format("woff");
+  font-display: swap;
+}
+
 /* ── Tokens ─────────────────────────────────────────────────────────
    Source of truth: COLOUR-SHIFT-STYLE-GUIDE.md (Figma wins, docs/adr/0001).
    Change a value here and every component using it updates. */
@@ -27,6 +48,7 @@
   --cs-canvas: #0f0e0f;
   --cs-surface: #1a1718;
   --cs-surface-raised: #262626;
+  --cs-surface-control: #212121; /* font dropdown, selected font option (Figma) */
   --cs-stroke: rgb(62 62 62 / 0.8); /* #3e3e3e at 80% */
   --cs-border: #1b191a;
   --cs-well: #000000;
@@ -55,6 +77,7 @@
   --color-canvas: var(--cs-canvas);
   --color-surface: var(--cs-surface);
   --color-surface-raised: var(--cs-surface-raised);
+  --color-surface-control: var(--cs-surface-control);
   --color-stroke: var(--cs-stroke);
   --color-border: var(--cs-border);
   --color-well: var(--cs-well);

@@ -34,7 +34,7 @@ This is my first project run like this; I'm learning as we go.
 
 ## Stack
 
-Next.js 16, React 19, TypeScript, Tailwind v4 (config lives in `globals.css`), pnpm, culori, apca-w3, node-vibrant, opentype.js. No GSAP; use CSS transitions only.
+Next.js 16, React 19, TypeScript, Tailwind v4 (config lives in `globals.css`), pnpm, culori, apca-w3, node-vibrant. No GSAP; use CSS transitions only.
 
 > **Next.js 16 has breaking changes.** APIs differ from training data. Before writing Next-specific code, read the relevant guide in `node_modules/next/dist/docs/`.
 
@@ -42,7 +42,7 @@ Next.js 16, React 19, TypeScript, Tailwind v4 (config lives in `globals.css`), p
 
 - `UNSPLASH_ACCESS_KEY` in `.env.local` (never commit it or print its value)
 - Deploys to Vercel at the site root (no basePath)
-- Licensed fonts (Input Mono now; others at step 4) live in `public/fonts/`, which is gitignored. Local use only. The repo is public and the licences forbid redistribution. Always give a free fallback (Geist Mono for the UI). Before deploying: buy web licences and decide how the files reach Vercel.
+- Licensed fonts (Input Mono, Departure Mono, Alpha Lyrae, Ghost Byte) live in `public/fonts/`, which is gitignored. Local use only. The repo is public and the licences forbid redistribution. Always give a free fallback (Geist Mono for the UI). Before deploying: buy web licences and decide how the files reach Vercel.
 
 ## Architecture
 
@@ -50,18 +50,19 @@ Next.js 16, React 19, TypeScript, Tailwind v4 (config lives in `globals.css`), p
 src/
 ├── app/
 │   ├── api/photos/route.ts # The only server code: Unsplash proxy (?count, ?id, ?download). Key stays here
-│   ├── layout.tsx          # Root layout: metadata (title "Colour Shift"), Geist Mono fallback font
+│   ├── layout.tsx          # Root layout: metadata (title "Colour Shift"), Google fonts (Geist, Geist Mono, Instrument Serif) as CSS variables
 │   ├── page.tsx            # Renders <ColorShift /> only
-│   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + Input Mono @font-face + base styles
+│   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + licensed @font-faces (Input Mono, Departure Mono, Alpha Lyrae, Ghost Byte) + slide keyframes + reduced motion + base styles
 ├── components/
-│   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open, photo stream + index + pairs by photo id. Keyboard (Esc, ← →, Space)
-│   ├── stage.tsx           # Colour panel (painted from props; crossfades only for photo pairs) + photo panel
+│   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open, specimen font + font menu open, photo stream + index + pairs by photo id. Keyboard (Esc, ← →, Space)
+│   ├── stage.tsx           # Colour panel (painted from props; crossfades only for photo pairs; font dropdown top-left) + photo panel
 │   ├── photo-panel.tsx     # Photo layers (leaving + current) that slide, blurred preview under each, credit, hover arrows
 │   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
 │   ├── dock.tsx            # 2 halves: pickers + swap … method switch | centre | levels + score … photo arrows (export later)
-│   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider
+│   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider, dropdown
 ├── lib/
 │   ├── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text, pickPair
+│   ├── fonts.ts            # The 7 specimen fonts: id, label, CSS family with free fallback. Default Departure Mono
 │   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing (photoSrc, previewSrc), preloadPhoto, download tracking, extractPair (node-vibrant, lazy-loaded)
 └── types/
     ├── apca-w3.d.ts        # Hand-written types; apca-w3 ships none
@@ -77,7 +78,7 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **Anchors** (ADR 0005): `color-shift.tsx` keeps `anchors` beside `colors`. User edits set both; level clicks derive `colors` from `anchors` and never touch them.
 - **Dock is two equal halves** split at the screen centre: pickers left, contrast method switch ends 12px left of centre; levels + score start 12px right of centre and grow rightwards. The switch never moves. Score: standard button states, white text while levels are open.
 - **Slider** = invisible native `<input type="range">` on top (drag, keys, a11y) + drawn track/grip beneath. Grip centre travels 12px in from each end to match the 24px native thumb.
-- **Colours from state** are the one allowed inline `style` colour (stage, swatch). Chrome colours always use token classes.
+- **Colours from state** are the one allowed inline `style` colour (stage, swatch). The specimen font is also state, so it's set inline too (`fontFamily`). Chrome colours always use token classes.
 - **`transition`** uses the style guide's default timing, set via `--default-transition-*` in `@theme`.
 - **Photos are plain `<img>`, not `next/image`.** Unsplash (imgix) resizes via URL params (`photoSrc`); Vercel's optimiser would add cost and a second resize. Extraction reads a 200px copy.
 - **A photo's pair sets colours and anchors** (it counts as the user's choice). Pairs are extracted as photos arrive and kept in `pairs` by photo id; the colours follow the current photo's pair *during render* (`pairFor` guard), not in an effect, so photo and pair paint together. ← restores a photo's original pair (edits aren't remembered per photo: that'd be history, out of scope).
@@ -88,6 +89,8 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **Colour crossfade:** `fadeColors` is true when colours came from a photo, false after any hand edit (slider, level, swap), so hand edits are instant. 0.1s delay + 0.7s so colours trail the slide (user's call: softer than the guide's 0.4s). `START_COLORS` is an empty dark panel (text = bg) so the first pair fades in rather than shifting from grey.
 - **Reduced motion:** global rule in `globals.css`: transitions 0, animations 1ms (not none, so `animationend` still fires and leaving photos get removed).
 - **Space** moves the first unshown photo to just after the current one; if none, fetches a batch and inserts it there. ← always returns.
+- **Specimen fonts:** free ones via `next/font/google` (hosted with the site, no layout shift); licensed ones via plain `@font-face` so a missing file falls back instead of failing the build. `lib/fonts.ts` joins both into one list. Licensed monos fall back to Geist Mono, Alpha Lyrae to Geist. opentype.js dropped: the reference only used it for social preview images (out of scope).
+- **Dropdown** (`ui/dropdown.tsx`, Figma `font dropdown` + `font menu`): open state lives in `color-shift` (Esc closes it with the other panels). Outside pointerdown closes; ↑ ↓ wrap through `menuitemradio`s; choosing or Esc returns focus to the trigger. Opens with `starting:` (@starting-style) fade + 4px drop; closes instantly.
 - **Photo requests go through `requestPhotos`** in `color-shift.tsx`: a ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo; ~6 calls at start-up).
 - **Run `pnpm dev` in its own Terminal**, not via `! pnpm dev`: Claude Code moves long `!` commands to the background and stops them when memory runs low.
 - **pnpm** 12.6.0 via corepack, installed to `~/.local/bin` (not `/usr/local/bin`, which needs admin rights). `packageManager` in `package.json` pins the version.

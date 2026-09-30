@@ -32,7 +32,7 @@ A one-page web app for **finding new colour pairings**. It shows a stream of ran
 
 ## Technical basics
 
-- **Same stack as MDS:** Next.js 16, React 19, TypeScript, Tailwind v4, pnpm, culori, apca-w3, node-vibrant, opentype.js
+- **Same stack as MDS:** Next.js 16, React 19, TypeScript, Tailwind v4, pnpm, culori, apca-w3, node-vibrant (opentype.js dropped 2026-09-30: only needed for social previews, out of scope)
 - **Hosting:** Vercel, at the root of my own URL, with none of his `/color-shift` base path
 - **Unsplash key** kept in `.env.local` locally (`UNSPLASH_ACCESS_KEY`) and set as an environment variable in Vercel
 - None of the Shift Nudge wiring: no Shift Nudge tracking tags on Unsplash links, no embed messaging, no Shift Nudge favicon

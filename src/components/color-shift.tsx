@@ -14,6 +14,7 @@ import {
   type Pair,
   type Role,
 } from "@/lib/color-engine";
+import { DEFAULT_FONT, type SpecimenFontId } from "@/lib/fonts";
 import { extractPair, fetchRandomPhotos, preloadPhoto, trackDownload } from "@/lib/photos";
 import type { Photo } from "@/types/photo";
 
@@ -45,6 +46,8 @@ export function ColorShift() {
   const [colorMode, setColorMode] = useState<ColorMode>("hsb");
   const [contrastMethod, setContrastMethod] = useState<ContrastMethod>("wcag");
   const [levelsOpen, setLevelsOpen] = useState(false);
+  const [font, setFont] = useState<SpecimenFontId>(DEFAULT_FONT);
+  const [fontMenuOpen, setFontMenuOpen] = useState(false);
   // The photo stream, in order, and which one is showing. ← walks back; the rest are loaded ahead.
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [photoIndex, setPhotoIndex] = useState(0);
@@ -121,6 +124,7 @@ export function ColorShift() {
     if (event.key === "Escape") {
       setActiveRole(null);
       setLevelsOpen(false);
+      setFontMenuOpen(false);
       return;
     }
     if (event.metaKey || event.ctrlKey || event.altKey || isTyping(event.target)) return;
@@ -221,6 +225,14 @@ export function ColorShift() {
         fadeColors={fadeColors}
         photo={photo}
         photoIndex={photoIndex}
+        font={font}
+        fontMenuOpen={fontMenuOpen}
+        onToggleFontMenu={() => setFontMenuOpen((open) => !open)}
+        onChooseFont={(chosen) => {
+          setFont(chosen);
+          setFontMenuOpen(false);
+        }}
+        onCloseFontMenu={() => setFontMenuOpen(false)}
         onPreviousPhoto={previousPhoto}
         onNextPhoto={nextPhoto}
       />
