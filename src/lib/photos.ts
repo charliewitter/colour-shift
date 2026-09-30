@@ -27,6 +27,16 @@ export async function fetchRandomPhotos(count: number): Promise<Photo[]> {
   return res.json();
 }
 
+/** One photo by id (share links), or null if Unsplash can't find it or the request fails. */
+export async function fetchPhoto(id: string): Promise<Photo | null> {
+  try {
+    const res = await fetch(`/api/photos?id=${encodeURIComponent(id)}`);
+    return res.ok ? await res.json() : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Starts downloading the display copy so it's already cached when the photo is shown. */
 export function preloadPhoto(photo: Photo): void {
   new Image().src = photoSrc(photo);

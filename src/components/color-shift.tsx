@@ -17,8 +17,8 @@ import {
 } from "@/lib/color-engine";
 import { DEFAULT_FONT, type SpecimenFontId } from "@/lib/fonts";
 import { copyText, downloadText } from "@/lib/export";
-import { shareQuery } from "@/lib/share";
-import { extractPair, fetchRandomPhotos, preloadPhoto, trackDownload } from "@/lib/photos";
+import { DEFAULT_METHOD, DEFAULT_TEXT, shareQuery, type SharedParams } from "@/lib/share";
+import { extractPair, fetchPhoto, fetchRandomPhotos, preloadPhoto, trackDownload } from "@/lib/photos";
 import type { Photo } from "@/types/photo";
 
 // An empty dark panel (--cs-surface, text the same so "Aa" is invisible) until the first photo's pair fades in.
@@ -47,30 +47,43 @@ function isTyping(target: EventTarget | null): boolean {
 }
 
 // The whole app. All state lives here (APP-SPEC: one top-level component); children get values and callbacks.
-export function ColorShift() {
-  const [colors, setColors] = useState(START_COLORS);
+// `shared` is what a share link asked for (page.tsx reads it on the server), so the first render
+// already shows it.
+export function ColorShift({ shared }: { shared: SharedParams }) {
+  const [sharedColors] = useState<Pair | null>(() =>
+    shared.colors ? { text: fromHex(shared.colors.text), bg: fromHex(shared.colors.bg) } : null,
+  );
+  const [colors, setColors] = useState(sharedColors ?? START_COLORS);
   // Each colour as the user last set it (CONTEXT.md: Anchor colour). Levels work from these,
   // so repeated level clicks never compound gamut losses (docs/adr/0005).
-  const [anchors, setAnchors] = useState(START_COLORS);
+  const [anchors, setAnchors] = useState(sharedColors ?? START_COLORS);
   const [activeRole, setActiveRole] = useState<Role | null>(null);
   const [colorMode, setColorMode] = useState<ColorMode>("hsb");
-  const [contrastMethod, setContrastMethod] = useState<ContrastMethod>("wcag");
+  const [contrastMethod, setContrastMethod] = useState<ContrastMethod>(shared.method ?? DEFAULT_METHOD);
   const [levelsOpen, setLevelsOpen] = useState(false);
-  const [sampleText, setSampleText] = useState("Aa");
-  const [font, setFont] = useState<SpecimenFontId>(DEFAULT_FONT);
+  const [sampleText, setSampleText] = useState(shared.text ?? DEFAULT_TEXT);
+  const [font, setFont] = useState<SpecimenFontId>(shared.font ?? DEFAULT_FONT);
   const [fontMenuOpen, setFontMenuOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   // The photo stream, in order, and which one is showing. ← walks back; the rest are loaded ahead.
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [photoIndex, setPhotoIndex] = useState(0);
   // Each photo's pair, extracted as soon as the photo arrives, so showing it is instant.
-  const [pairs, setPairs] = useState<Record<string, Pair>>({});
+  // A shared photo's pair is the shared one (so ← back to it restores that), and isn't extracted.
+  const [pairs, setPairs] = useState<Record<string, Pair>>(() =>
+    shared.photoId && sharedColors ? { [shared.photoId]: sharedColors } : {},
+  );
   // Which photo's pair the colours were last set from (null while the current one is still extracting).
   const [pairFor, setPairFor] = useState<string | null>(null);
   // True when the colours last came from a photo (they crossfade), false after a hand edit (instant).
   const [fadeColors, setFadeColors] = useState(false);
+  // Shared colours survive the first photo's pair, whichever photo that turns out to be (the
+  // shared one, or a random one if the shared photo couldn't load).
+  const [keepSharedColors, setKeepSharedColors] = useState(sharedColors !== null);
+  // The random stream waits for a shared photo, so it can go first.
+  const [waitingForShared, setWaitingForShared] = useState(shared.photoId !== null);
   const loadingPhotos = useRef(false);
-  const prepared = useRef(new Set<string>());
+  const prepared = useRef(new Set<string>(shared.photoId && sharedColors ? [shared.photoId] : []));
   const shown = useRef(new Set<string>());
   const photo = photos[photoIndex] ?? null;
   const pair = photo ? pairs[photo.id] : undefined;
@@ -81,9 +94,13 @@ export function ColorShift() {
   // follows other state, and it lands in the same paint as the photo.
   if (photo && pair && pairFor !== photo.id) {
     setPairFor(photo.id);
-    setFadeColors(true);
-    setColors(pair);
-    setAnchors(pair);
+    if (keepSharedColors) {
+      setKeepSharedColors(false);
+    } else {
+      setFadeColors(true);
+      setColors(pair);
+      setAnchors(pair);
+    }
   } else if (photo && !pair && pairFor !== null) {
     setPairFor(null);
   }
@@ -104,9 +121,21 @@ export function ColorShift() {
     }
   }
 
+  // A share link's photo goes first. If it can't load, the stream just starts with random ones.
+  // The ref guard stops dev mode's double effect from spending two API calls.
+  const sharedRequested = useRef(false);
+  useEffect(() => {
+    if (!shared.photoId || sharedRequested.current) return;
+    sharedRequested.current = true;
+    fetchPhoto(shared.photoId).then((sharedPhoto) => {
+      if (sharedPhoto) setPhotos((current) => [sharedPhoto, ...current]);
+      setWaitingForShared(false);
+    });
+  }, [shared.photoId]);
+
   // Keeps PHOTOS_AHEAD photos loaded past the current one (this is also the first load).
   useEffect(() => {
-    if (photosAhead >= PHOTOS_AHEAD) return;
+    if (waitingForShared || photosAhead >= PHOTOS_AHEAD) return;
     requestPhotos().then((batch) => {
       if (batch?.length) setPhotos((current) => [...current, ...batch]);
       else if (batch) {
@@ -116,7 +145,7 @@ export function ColorShift() {
         setAnchors((current) => (current === START_COLORS ? FALLBACK_COLORS : current));
       }
     });
-  }, [photosAhead]);
+  }, [photosAhead, waitingForShared]);
 
   // Each photo, once, as it arrives: start downloading it and extract its pair.
   useEffect(() => {

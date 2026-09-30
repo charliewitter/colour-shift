@@ -4,6 +4,33 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-09-30: Step 5 (copy, share link and export)
+
+**Done**
+- 5A: EXPORT in the dock opens COPY URL, DOWNLOAD .MD, CLOSE (Figma `export`). Copy uses the Clipboard API with an `execCommand` fallback; labels confirm for 1.5s (`COPIED`, `DOWNLOADED`) at a fixed width. Markdown: both colours (hex, RGB, OKLCH), score, share link, photo credit.
+- 5B: `page.tsx` reads the share link on the server, so the first render already shows it. Shared photo first, shared colours kept, bad fields ignored one by one.
+- Fix: slider gradients reach both ends of the track (`bg-origin-border`).
+- Sample text fades to 50% on hover.
+- Browser checks (user) passed.
+
+**Decided**
+- **Font in the share link** (`font=`). User.
+- **No `swap` param:** swap exchanges the colours, so fg/bg already record it. User.
+- **Address bar never updated**; links built only when copied. User.
+- **Defaults left out of links** (WCAG, Departure Mono, "Aa").
+- **Labels:** `DOWNLOAD .MD` (Figma updated by user), `COPIED` rather than `COPIED URL` (similar length). User.
+- **`/` is now rendered per request** (reading `searchParams`), not prebuilt.
+
+**Loose ends**
+- Font files still to copy into `public/fonts/` (see step 4 entry).
+- Share links carry 8-bit hex, so an OKLCH-edited colour reopens very slightly rounded. Fine for now.
+- A share link costs ~7 Unsplash calls on open (1 by id + buffer).
+
+**Next**
+- Step 6: mobile layout.
+
+---
+
 ## 2026-09-30: Step 4 (sample text and fonts)
 
 **Done**

@@ -51,7 +51,7 @@ src/
 ├── app/
 │   ├── api/photos/route.ts # The only server code: Unsplash proxy (?count, ?id, ?download). Key stays here
 │   ├── layout.tsx          # Root layout: metadata (title "Colour Shift"), Google fonts (Geist, Geist Mono, Instrument Serif) as CSS variables
-│   ├── page.tsx            # Renders <ColorShift /> only
+│   ├── page.tsx            # Reads share-link searchParams on the server (parseShare) → <ColorShift shared /> . Makes / dynamic (ƒ)
 │   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + licensed @font-faces (Input Mono, Departure Mono, Alpha Lyrae, Ghost Byte) + slide keyframes + reduced motion + base styles
 ├── components/
 │   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open, sample text, specimen font + font menu open, photo stream + index + pairs by photo id. Keyboard (Esc, ← →, Space)
@@ -63,10 +63,10 @@ src/
 │   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider, dropdown
 ├── lib/
 │   ├── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text, exportMarkdown, pickPair
-│   ├── share.ts            # Share link: shareQuery (defaults left out)
+│   ├── share.ts            # Share link: shareQuery (defaults left out), parseShare (field-by-field validation), defaults + MAX_TEXT_LENGTH
 │   ├── export.ts           # Browser side of export: copyText (execCommand fallback), downloadText (Blob)
 │   ├── fonts.ts            # The 7 specimen fonts: id, label, CSS family with free fallback. Default Departure Mono
-│   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing (photoSrc, previewSrc), preloadPhoto, download tracking, extractPair (node-vibrant, lazy-loaded)
+│   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing (photoSrc, previewSrc), fetchPhoto (by id), preloadPhoto, download tracking, extractPair (node-vibrant, lazy-loaded)
 └── types/
     ├── apca-w3.d.ts        # Hand-written types; apca-w3 ships none
     └── photo.ts            # Photo: what /api/photos returns
@@ -96,6 +96,8 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **Dropdown** (`ui/dropdown.tsx`, Figma `font dropdown` + `font menu`): open state lives in `color-shift` (Esc closes it with the other panels). Outside pointerdown closes; ↑ ↓ wrap through `menuitemradio`s; choosing or Esc returns focus to the trigger. Opens with `starting:` (@starting-style) fade + 4px drop; closes instantly.
 - **Sample text** (`sample-text.tsx`): uncontrolled `contentEditable="plaintext-only"`; React never renders its children (caret stays put), `onInput` copies text to state, a layout effect copies state in only when it differs (share links). Shrink to fit: binary search 96→16px inside the panel inset 64px, written to `style.fontSize` (a measurement, not state), re-run on text/font/resize/`document.fonts` loadingdone; at 16px a too-long word breaks anywhere. Enter/Esc blur. Selection tint via `--sample-color` + `color-mix`. No focus ring: the caret is the focus state.
 - **Export:** `exportOpen` state in `color-shift` (Esc closes). Confirmation labels are local to `ExportControls` (visual-only), 1.5s, and reserve the longest label's width (`StableLabel`). Focus moves to COPY URL on open, back to EXPORT on close. Share URL built on demand from state; Markdown text in `color-engine` (colour formatting), read from on-screen hex.
+- **Opening a share link:** state starts from `shared` via `useState` initialisers (no flash of defaults; hex strings cross the server→client boundary, colours made client-side). The shared photo is fetched first (`waitingForShared` holds the random stream), its pair pre-filled with the shared colours and never extracted (so ← restores them). `keepSharedColors` makes the first photo shown skip its pair once, so shared colours survive even if the shared photo fails. Invalid fields are ignored individually; fg/bg only together.
+- **Sample text hover:** fades to 50% on hover (reads as editable), full while focused. User.
 - **Slider track** uses `bg-origin-border`: otherwise the gradient is sized inside the 1px border and repeats under it.
 - **Photo requests go through `requestPhotos`** in `color-shift.tsx`: returns `null` when skipped (one in flight), `[]` when failed. If the first batch fails, `FALLBACK_COLORS` (muted on surface) fade in, only if nothing has set colours yet. Failures `console.warn` (errors pop Next's dev overlay). A ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo; ~6 calls at start-up).
 - **Run `pnpm dev` in its own Terminal**, not via `! pnpm dev`: Claude Code moves long `!` commands to the background and stops them when memory runs low.
