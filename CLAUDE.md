@@ -54,7 +54,7 @@ src/
 │   ├── page.tsx            # Renders <ColorShift /> only
 │   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + Input Mono @font-face + base styles
 ├── components/
-│   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open, photos + index. Esc handler
+│   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open, photo stream + index + pairs by photo id. Keyboard (Esc, ← →, Space)
 │   ├── stage.tsx           # Colour panel (painted from props) + photo panel
 │   ├── photo-panel.tsx     # Photo (plain <img>), credit, hover arrows
 │   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
@@ -62,7 +62,7 @@ src/
 │   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider
 ├── lib/
 │   ├── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text, pickPair
-│   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing, download tracking, extractPair (node-vibrant, lazy-loaded)
+│   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing, preloadPhoto, download tracking, extractPair (node-vibrant, lazy-loaded)
 └── types/
     ├── apca-w3.d.ts        # Hand-written types; apca-w3 ships none
     └── photo.ts            # Photo: what /api/photos returns
@@ -80,7 +80,10 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **Colours from state** are the one allowed inline `style` colour (stage, swatch). Chrome colours always use token classes.
 - **`transition`** uses the style guide's default timing, set via `--default-transition-*` in `@theme`.
 - **Photos are plain `<img>`, not `next/image`.** Unsplash (imgix) resizes via URL params (`photoSrc`); Vercel's optimiser would add cost and a second resize. Extraction reads a 200px copy.
-- **A photo's pair sets colours and anchors** (it counts as the user's choice). Extraction results for a photo no longer showing are dropped.
-- **Photo requests go through `requestPhotos`** in `color-shift.tsx`: a ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo).
+- **A photo's pair sets colours and anchors** (it counts as the user's choice). Pairs are extracted as photos arrive and kept in `pairs` by photo id; the colours follow the current photo's pair *during render* (`pairFor` guard), not in an effect, so photo and pair paint together. ← restores a photo's original pair (edits aren't remembered per photo: that'd be history, out of scope).
+- **Buffer:** an effect keeps `PHOTOS_AHEAD` (3) photos past the current one, fetching `PHOTO_BATCH` (3) at a time; it also does the first load. Each arriving photo is preloaded and extracted once (`prepared` ref). Download tracking fires when a photo is shown, not buffered (`shown` ref).
+- **Keyboard:** one `keydown` listener via `useEffectEvent`. ← → and Space skip inputs/textareas/contenteditable (so a focused slider keeps its arrows) and modifier keys (Cmd+← stays browser back). Space on a focused button presses the button.
+- **Space** moves the first unshown photo to just after the current one; if none, fetches a batch and inserts it there. ← always returns.
+- **Photo requests go through `requestPhotos`** in `color-shift.tsx`: a ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo; ~6 calls at start-up).
 - **Run `pnpm dev` in its own Terminal**, not via `! pnpm dev`: Claude Code moves long `!` commands to the background and stops them when memory runs low.
 - **pnpm** 12.6.0 via corepack, installed to `~/.local/bin` (not `/usr/local/bin`, which needs admin rights). `packageManager` in `package.json` pins the version.

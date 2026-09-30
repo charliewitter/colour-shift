@@ -22,6 +22,11 @@ export async function fetchRandomPhotos(count: number): Promise<Photo[]> {
   return res.json();
 }
 
+/** Starts downloading the display copy so it's already cached when the photo is shown. */
+export function preloadPhoto(photo: Photo): void {
+  new Image().src = photoSrc(photo);
+}
+
 /** Unsplash asks for this whenever a photo is used. Fire and forget: failure shouldn't bother the user. */
 export function trackDownload(photo: Photo): void {
   fetch(`/api/photos?download=${encodeURIComponent(photo.id)}`).catch(() => {});

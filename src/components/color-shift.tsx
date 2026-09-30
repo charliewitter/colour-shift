@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Dock } from "@/components/dock";
 import { SliderPanel } from "@/components/slider-panel";
 import { Stage } from "@/components/stage";
@@ -14,7 +14,7 @@ import {
   type Pair,
   type Role,
 } from "@/lib/color-engine";
-import { extractPair, fetchRandomPhotos, trackDownload } from "@/lib/photos";
+import { extractPair, fetchRandomPhotos, preloadPhoto, trackDownload } from "@/lib/photos";
 import type { Photo } from "@/types/photo";
 
 // Shown until the first photo's pair arrives (Figma's mockup pair). Darker colour as background.
@@ -23,8 +23,17 @@ const START_COLORS: Pair = {
   bg: fromHex("#3a1020"),
 };
 
-// Photos fetched per request: enough to step forward a few times without waiting.
+// Photos fetched per request, and how many to keep loaded ahead of the current one.
 const PHOTO_BATCH = 3;
+const PHOTOS_AHEAD = 3;
+
+// Keys typed here belong to the field, not to photo navigation.
+function isTyping(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement &&
+    (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+  );
+}
 
 // The whole app. All state lives here (APP-SPEC: one top-level component); children get values and callbacks.
 export function ColorShift() {
@@ -36,12 +45,30 @@ export function ColorShift() {
   const [colorMode, setColorMode] = useState<ColorMode>("hsb");
   const [contrastMethod, setContrastMethod] = useState<ContrastMethod>("wcag");
   const [levelsOpen, setLevelsOpen] = useState(false);
-  // Photos seen so far, in order, and which one is showing. ← walks back through them.
+  // The photo stream, in order, and which one is showing. ← walks back; the rest are loaded ahead.
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [photoIndex, setPhotoIndex] = useState(0);
+  // Each photo's pair, extracted as soon as the photo arrives, so showing it is instant.
+  const [pairs, setPairs] = useState<Record<string, Pair>>({});
+  // Which photo's pair the colours were last set from (null while the current one is still extracting).
+  const [pairFor, setPairFor] = useState<string | null>(null);
   const loadingPhotos = useRef(false);
-  const tracked = useRef(new Set<string>());
+  const prepared = useRef(new Set<string>());
+  const shown = useRef(new Set<string>());
   const photo = photos[photoIndex] ?? null;
+  const pair = photo ? pairs[photo.id] : undefined;
+  const photosAhead = photos.length - 1 - photoIndex;
+
+  // A new photo brings its own pair. It counts as the user's choice, so it sets the anchors too
+  // (docs/adr/0005). Set during render rather than in an effect: React's pattern for state that
+  // follows other state, and it lands in the same paint as the photo.
+  if (photo && pair && pairFor !== photo.id) {
+    setPairFor(photo.id);
+    setColors(pair);
+    setAnchors(pair);
+  } else if (photo && !pair && pairFor !== null) {
+    setPairFor(null);
+  }
 
   // A batch of random photos, or none if one is already on its way (or the request failed).
   // The guard also stops React's dev-mode double effect from spending two API calls.
@@ -58,37 +85,53 @@ export function ColorShift() {
     }
   }
 
-  // First batch on load.
+  // Keeps PHOTOS_AHEAD photos loaded past the current one (this is also the first load).
   useEffect(() => {
-    requestPhotos().then((batch) => setPhotos((current) => [...current, ...batch]));
-  }, []);
-
-  // A new photo brings its own pair. It counts as the user's choice, so it sets the anchors too
-  // (docs/adr/0005). If the user moves on before extraction finishes, the stale result is dropped.
-  useEffect(() => {
-    if (!photo) return;
-    if (!tracked.current.has(photo.id)) {
-      tracked.current.add(photo.id);
-      trackDownload(photo);
-    }
-    let current = true;
-    extractPair(photo).then((pair) => {
-      if (!current || !pair) return;
-      setColors(pair);
-      setAnchors(pair);
+    if (photosAhead >= PHOTOS_AHEAD) return;
+    requestPhotos().then((batch) => {
+      if (batch.length) setPhotos((current) => [...current, ...batch]);
     });
-    return () => {
-      current = false;
-    };
+  }, [photosAhead]);
+
+  // Each photo, once, as it arrives: start downloading it and extract its pair.
+  useEffect(() => {
+    for (const next of photos) {
+      if (prepared.current.has(next.id)) continue;
+      prepared.current.add(next.id);
+      preloadPhoto(next);
+      extractPair(next).then((extracted) => {
+        if (extracted) setPairs((current) => ({ ...current, [next.id]: extracted }));
+      });
+    }
+  }, [photos]);
+
+  // Unsplash counts a photo as used when it's shown, not when it's loaded ahead.
+  useEffect(() => {
+    if (!photo || shown.current.has(photo.id)) return;
+    shown.current.add(photo.id);
+    trackDownload(photo);
   }, [photo]);
 
-  // Esc closes any open panel.
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
+  // ← → step through photos and Space jumps to a new one (not while typing). Esc closes any open panel.
+  // useEffectEvent: the listener is added once but always sees the latest state.
+  const onKeyDown = useEffectEvent((event: KeyboardEvent) => {
+    if (event.key === "Escape") {
       setActiveRole(null);
       setLevelsOpen(false);
+      return;
     }
+    if (event.metaKey || event.ctrlKey || event.altKey || isTyping(event.target)) return;
+    if (event.key === "ArrowLeft") previousPhoto();
+    else if (event.key === "ArrowRight") nextPhoto();
+    else if (event.key === " ") {
+      // Space on a focused button presses that button instead.
+      if (event.target instanceof HTMLButtonElement) return;
+      event.preventDefault();
+      jumpPhoto();
+    }
+  });
+
+  useEffect(() => {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
@@ -125,7 +168,8 @@ export function ColorShift() {
     setPhotoIndex((index) => Math.max(0, index - 1));
   }
 
-  // Steps forward; at the end of the list it fetches more and moves once they arrive.
+  // Steps forward. At the end of the stream (the buffer ran dry, or a fetch failed) it fetches
+  // more itself and moves once they arrive.
   async function nextPhoto() {
     if (photoIndex < photos.length - 1) {
       setPhotoIndex(photoIndex + 1);
@@ -135,6 +179,29 @@ export function ColorShift() {
     if (batch.length === 0) return;
     setPhotos((current) => [...current, ...batch]);
     setPhotoIndex((index) => index + 1);
+  }
+
+  // Space: the first photo not yet shown moves to just after the current one, and shows.
+  // So after walking back, Space still brings something new, and ← still returns here.
+  async function jumpPhoto() {
+    const at = photoIndex;
+    const unseen = photos.findIndex((next, index) => index > at && !shown.current.has(next.id));
+    if (unseen === -1) {
+      const batch = await requestPhotos();
+      if (batch.length === 0) return;
+      setPhotos((current) => [...current.slice(0, at + 1), ...batch, ...current.slice(at + 1)]);
+      setPhotoIndex(at + 1);
+      return;
+    }
+    if (unseen !== photoIndex + 1) {
+      setPhotos((current) => {
+        const reordered = [...current];
+        const [moved] = reordered.splice(unseen, 1);
+        reordered.splice(at + 1, 0, moved);
+        return reordered;
+      });
+    }
+    setPhotoIndex(at + 1);
   }
 
   const textHex = toHex(colors.text);
