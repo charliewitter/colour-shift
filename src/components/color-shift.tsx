@@ -24,6 +24,13 @@ const START_COLORS: Pair = {
   bg: fromHex("#1a1718"),
 };
 
+// If the first photos can't load (e.g. the Unsplash key's hourly limit): muted text on the dark
+// panel (--cs-text-muted on --cs-surface), so the app still works as a colour tool.
+const FALLBACK_COLORS: Pair = {
+  text: fromHex("#a39f9f"),
+  bg: fromHex("#1a1718"),
+};
+
 // Photos fetched per request, and how many to keep loaded ahead of the current one.
 const PHOTO_BATCH = 3;
 const PHOTOS_AHEAD = 3;
@@ -46,6 +53,7 @@ export function ColorShift() {
   const [colorMode, setColorMode] = useState<ColorMode>("hsb");
   const [contrastMethod, setContrastMethod] = useState<ContrastMethod>("wcag");
   const [levelsOpen, setLevelsOpen] = useState(false);
+  const [sampleText, setSampleText] = useState("Aa");
   const [font, setFont] = useState<SpecimenFontId>(DEFAULT_FONT);
   const [fontMenuOpen, setFontMenuOpen] = useState(false);
   // The photo stream, in order, and which one is showing. ← walks back; the rest are loaded ahead.
@@ -76,15 +84,16 @@ export function ColorShift() {
     setPairFor(null);
   }
 
-  // A batch of random photos, or none if one is already on its way (or the request failed).
-  // The guard also stops React's dev-mode double effect from spending two API calls.
-  async function requestPhotos(): Promise<Photo[]> {
-    if (loadingPhotos.current) return [];
+  // A batch of random photos: [] if the request failed, null if skipped because one is already
+  // on its way. The guard also stops React's dev-mode double effect from spending two API calls.
+  async function requestPhotos(): Promise<Photo[] | null> {
+    if (loadingPhotos.current) return null;
     loadingPhotos.current = true;
     try {
       return await fetchRandomPhotos(PHOTO_BATCH);
     } catch (error) {
-      console.error(error);
+      // A warning, not an error: it's handled, and Next's dev overlay pops up for errors.
+      console.warn(error);
       return [];
     } finally {
       loadingPhotos.current = false;
@@ -95,7 +104,13 @@ export function ColorShift() {
   useEffect(() => {
     if (photosAhead >= PHOTOS_AHEAD) return;
     requestPhotos().then((batch) => {
-      if (batch.length) setPhotos((current) => [...current, ...batch]);
+      if (batch?.length) setPhotos((current) => [...current, ...batch]);
+      else if (batch) {
+        // Failed. If nothing has set the colours yet, fade in the fallback pair.
+        setFadeColors(true);
+        setColors((current) => (current === START_COLORS ? FALLBACK_COLORS : current));
+        setAnchors((current) => (current === START_COLORS ? FALLBACK_COLORS : current));
+      }
     });
   }, [photosAhead]);
 
@@ -186,7 +201,7 @@ export function ColorShift() {
       return;
     }
     const batch = await requestPhotos();
-    if (batch.length === 0) return;
+    if (!batch?.length) return;
     setPhotos((current) => [...current, ...batch]);
     setPhotoIndex((index) => index + 1);
   }
@@ -198,7 +213,7 @@ export function ColorShift() {
     const unseen = photos.findIndex((next, index) => index > at && !shown.current.has(next.id));
     if (unseen === -1) {
       const batch = await requestPhotos();
-      if (batch.length === 0) return;
+      if (!batch?.length) return;
       setPhotos((current) => [...current.slice(0, at + 1), ...batch, ...current.slice(at + 1)]);
       setPhotoIndex(at + 1);
       return;
@@ -225,6 +240,8 @@ export function ColorShift() {
         fadeColors={fadeColors}
         photo={photo}
         photoIndex={photoIndex}
+        sampleText={sampleText}
+        onSampleTextChange={setSampleText}
         font={font}
         fontMenuOpen={fontMenuOpen}
         onToggleFontMenu={() => setFontMenuOpen((open) => !open)}

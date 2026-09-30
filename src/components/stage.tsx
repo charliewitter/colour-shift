@@ -1,4 +1,5 @@
 import { PhotoPanel } from "@/components/photo-panel";
+import { SampleText } from "@/components/sample-text";
 import { Dropdown } from "@/components/ui/dropdown";
 import { SPECIMEN_FONTS, specimenFont, type SpecimenFontId } from "@/lib/fonts";
 import type { Photo } from "@/types/photo";
@@ -11,6 +12,8 @@ type StageProps = {
   fadeColors: boolean;
   photo: Photo | null;
   photoIndex: number;
+  sampleText: string;
+  onSampleTextChange: (text: string) => void;
   font: SpecimenFontId;
   fontMenuOpen: boolean;
   onToggleFontMenu: () => void;
@@ -27,6 +30,8 @@ export function Stage({
   fadeColors,
   photo,
   photoIndex,
+  sampleText,
+  onSampleTextChange,
   font,
   fontMenuOpen,
   onToggleFontMenu,
@@ -41,7 +46,7 @@ export function Stage({
         className={`relative flex items-center justify-center ${fadeColors ? "transition-colors delay-100 duration-700" : ""}`}
         style={{ backgroundColor: bgHex, color: textHex }}
       >
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-4 left-4 z-10">
           <Dropdown
             label="Specimen font"
             options={SPECIMEN_FONTS}
@@ -53,9 +58,12 @@ export function Stage({
           />
         </div>
         {/* The chosen font is state, so it's set inline like the colours. */}
-        <p className="text-8xl leading-[1.05] tracking-[-0.02em]" style={{ fontFamily: specimenFont(font).family }}>
-          Aa
-        </p>
+        <SampleText
+          text={sampleText}
+          fontFamily={specimenFont(font).family}
+          textHex={textHex}
+          onChange={onSampleTextChange}
+        />
       </div>
       <PhotoPanel photo={photo} index={photoIndex} onPrevious={onPreviousPhoto} onNext={onNextPhoto} />
     </section>

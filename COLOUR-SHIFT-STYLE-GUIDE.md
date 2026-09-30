@@ -31,7 +31,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 - **Labels are UPPERCASE:** `EXPORT`, `COPY URL`, `DOWNLOAD .MD`, `CLOSE`, `OKLCH`, `HUE`. No labels on the colour pickers; the swatch + hex speaks for itself.
 - **Score text keeps the case the contrast check returns** (`Content Lc 74.9`, `AA Large 4.45:1`). It's data, not a label.
 - **Numbers** use tabular figures so scores don't jiggle.
-- **Sample text:** the chosen specimen font, `leading-[1.05]`, `tracking-tight`, centred.
+- **Sample text:** the chosen specimen font, `leading-[1.05]`, `-0.02em` tracking (Figma), centred. 96px, shrinking to fit the colour panel (down to 16px) as it grows. Max 100 characters.
 - **Specimen fonts:** Geist, Geist Mono, Instrument Serif, Alpha Lyrae, Departure Mono, Ghost Byte, Input Mono. Default: Departure Mono.
 
 ## Shape and spacing

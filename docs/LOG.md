@@ -4,6 +4,33 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-09-30: Step 4 (sample text and fonts)
+
+**Done**
+- 4A: seven specimen fonts (`lib/fonts.ts`). Geist, Geist Mono, Instrument Serif via `next/font/google`; Departure Mono, Alpha Lyrae, Ghost Byte via local-only `@font-face` with Geist fallbacks. Font dropdown + menu top-left of the colour panel per Figma (new token `--cs-surface-control` #212121), outside click / ↑ ↓ / Esc, `@starting-style` open.
+- 4B: editable sample text, shrink to fit (96→16px), 100-char limit, "Aa" when empty, selection tint, Enter/Esc stop editing.
+- Unsplash failures: `console.warn` and a visible fallback pair if the first batch fails.
+- Browser checks (user) passed for 4A and 4B.
+
+**Decided**
+- **Shrink to fit** rather than fixed size + clip. User.
+- **100-character limit.** User.
+- **opentype.js dropped** (only for social previews, out of scope). Docs updated. User.
+- **Menu names in the UI font**, not their own font (Figma).
+- **Fallback pair** when photos can't load. User.
+
+**Loose ends**
+- **Font files not yet copied** into `public/fonts/` (Departure Mono, Alpha Lyrae, Ghost Byte): `cp ../color-shift/src/fonts/{DepartureMono-Regular.woff2,AlphaLyrae-Medium.woff2,GhostByte-Regular.woff} public/fonts/`. Fallbacks show until then.
+- Font licences unchecked (ADR 0002 update). Departure Mono may be OFL.
+- Demo key hit its 50/hour limit during testing (403, `x-ratelimit-remaining: 0`). ~6 calls per reload. Apply for production access at step 8, or earlier if it keeps blocking.
+- The specimen font isn't in the share URL spec. Decide at step 5.
+- Sample text inset (64px) is a desktop value; revisit at step 6.
+
+**Next**
+- Step 5: copy, share link and export.
+
+---
+
 ## 2026-09-30: Step 3, part B (photo stream feel)
 
 **Done**
