@@ -18,7 +18,9 @@ export function Slider({ label, value, max, step, gradient, onChange, onRelease 
   return (
     <div className="group relative h-3">
       <div
-        className="absolute inset-x-0 top-1/4 bottom-1/4 rounded-full border border-track-edge"
+        // bg-origin-border: size the gradient to the whole track, border included. By default it's
+        // sized inside the border and repeats under it, showing the opposite end's colour at each end.
+        className="absolute inset-x-0 top-1/4 bottom-1/4 rounded-full border border-track-edge bg-origin-border"
         style={{ backgroundImage: gradient }}
       />
       {/* 24px hit area. Its centre travels 12px in from each end, like the native thumb. */}
