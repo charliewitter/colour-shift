@@ -63,7 +63,8 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 CSS transitions only.
 
 - **Default timing:** `0.2s cubic-bezier(0.33, 1, 0.68, 1)`
-- **Colour crossfade:** ~0.4s. **Photo slide:** ~0.6s.
+- **Colour crossfade:** 0.7s after a 0.1s delay, so the colours trail the photo slightly (softer; changed from ~0.4s on 2026-09-30). Only when colours come from a photo; hand edits are instant. **Photo slide:** 0.6s.
+- **First photo:** no slide and no blurred preview; the photo fades in over 0.2s and the colours fade in from an empty dark panel.
 - **Panels open** with `grid-template-rows: 0fr → 1fr`, a fade, and a small vertical slide.
 - **Mobile:** vertical motion only.
 - **Reduced motion:** respect `prefers-reduced-motion` and turn transitions off.

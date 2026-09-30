@@ -17,10 +17,10 @@ import {
 import { extractPair, fetchRandomPhotos, preloadPhoto, trackDownload } from "@/lib/photos";
 import type { Photo } from "@/types/photo";
 
-// Shown until the first photo's pair arrives (Figma's mockup pair). Darker colour as background.
+// An empty dark panel (--cs-surface, text the same so "Aa" is invisible) until the first photo's pair fades in.
 const START_COLORS: Pair = {
-  text: fromHex("#ff6f91"),
-  bg: fromHex("#3a1020"),
+  text: fromHex("#1a1718"),
+  bg: fromHex("#1a1718"),
 };
 
 // Photos fetched per request, and how many to keep loaded ahead of the current one.
@@ -52,6 +52,8 @@ export function ColorShift() {
   const [pairs, setPairs] = useState<Record<string, Pair>>({});
   // Which photo's pair the colours were last set from (null while the current one is still extracting).
   const [pairFor, setPairFor] = useState<string | null>(null);
+  // True when the colours last came from a photo (they crossfade), false after a hand edit (instant).
+  const [fadeColors, setFadeColors] = useState(false);
   const loadingPhotos = useRef(false);
   const prepared = useRef(new Set<string>());
   const shown = useRef(new Set<string>());
@@ -64,6 +66,7 @@ export function ColorShift() {
   // follows other state, and it lands in the same paint as the photo.
   if (photo && pair && pairFor !== photo.id) {
     setPairFor(photo.id);
+    setFadeColors(true);
     setColors(pair);
     setAnchors(pair);
   } else if (photo && !pair && pairFor !== null) {
@@ -143,6 +146,7 @@ export function ColorShift() {
 
   // The active colour follows its value into the new role (CONTEXT.md: Active colour).
   function swap() {
+    setFadeColors(false);
     setColors(({ text, bg }) => ({ text: bg, bg: text }));
     setAnchors(({ text, bg }) => ({ text: bg, bg: text }));
     setActiveRole((current) => (current === "text" ? "bg" : current === "bg" ? "text" : null));
@@ -150,6 +154,7 @@ export function ColorShift() {
 
   // A slider edit is the user setting the colour: it becomes the new anchor.
   function editColor(role: Role, color: Color) {
+    setFadeColors(false);
     setColors((current) => ({ ...current, [role]: color }));
     setAnchors((current) => ({ ...current, [role]: color }));
   }
@@ -158,6 +163,7 @@ export function ColorShift() {
   // It moves from its anchor, not from wherever the last level click left it.
   function chooseLevel(level: number) {
     const role = activeRole ?? "text";
+    setFadeColors(false);
     setColors((current) => {
       const start = { ...current, [role]: anchors[role] };
       return { ...current, [role]: reachLevel(start, role, level, contrastMethod) };
@@ -212,7 +218,9 @@ export function ColorShift() {
       <Stage
         textHex={textHex}
         bgHex={bgHex}
+        fadeColors={fadeColors}
         photo={photo}
+        photoIndex={photoIndex}
         onPreviousPhoto={previousPhoto}
         onNextPhoto={nextPhoto}
       />

@@ -4,6 +4,35 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-09-30: Step 3, part B (photo stream feel)
+
+**Done**
+- Buffer: 3 photos kept loaded ahead, fetched 3 at a time. Each is preloaded and its pair extracted on arrival, stored by photo id, so a photo and its pair show together. Tracking fires on show, not on buffer.
+- Keyboard: ← → step, Space jumps to an unseen photo inserted after the current one (fetches if none). Skipped in inputs (so a focused slider keeps its arrows), with modifier keys, and Space on a focused button.
+- Photo slide (0.6s, direction follows the stream), blurred preview under each photo, colour crossfade only for photo pairs.
+- Global reduced-motion rule.
+- Browser check (user) passed for B1 and B2's motion.
+
+**Decided**
+- **← restores a photo's original pair.** Remembering edits per photo would be history (out of scope). User.
+- **Neutral start:** empty dark panel instead of the pink mockup pair. User.
+- **First load snaps the photo** (no preview, quick fade); the colours still fade in. User found the full sequence too prominent.
+- **Softer crossfade:** 0.1s delay + 0.7s, so colours trail the slide. Style guide updated. User.
+- **Pair set during render, not in an effect** (react-hooks 7 flags setState in effects; also avoids a one-frame lag).
+
+**Loose ends**
+- Dock swatches/hex/score snap while the colour panel fades. Left as is (exact data).
+- Score reads `Fail 1.00:1` until the first pair arrives (start colours are equal).
+- Rapid ← → mid-slide drops the older leaving photo abruptly; fine so far.
+- Buffer counts photos ahead, not *unseen* ahead, so after walking back Space may need a fetch (it handles it).
+- `VIVID_WEIGHT` still a first guess. Demo key 50/hour: start-up now ~6 calls.
+- Mobile needs vertical motion (step 6).
+
+**Next**
+- Step 4: sample text and fonts.
+
+---
+
 ## 2026-09-30: Step 3, part A (photos and pairing)
 
 **Done**

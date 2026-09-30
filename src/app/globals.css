@@ -76,6 +76,41 @@
   --default-transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
 }
 
+/* ── Motion ─────────────────────────────────────────────────────────
+   Photo slide (style guide: ~0.6s). animate-slide-in-right is the new
+   photo arriving from the right (→); slide-out-left is the old one leaving. */
+
+@theme {
+  --animate-slide-in-right: slide-in-right 600ms cubic-bezier(0.33, 1, 0.68, 1);
+  --animate-slide-in-left: slide-in-left 600ms cubic-bezier(0.33, 1, 0.68, 1);
+  --animate-slide-out-left: slide-out-left 600ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  --animate-slide-out-right: slide-out-right 600ms cubic-bezier(0.33, 1, 0.68, 1) forwards;
+
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+  }
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); }
+  }
+  @keyframes slide-out-left {
+    to { transform: translateX(-100%); }
+  }
+  @keyframes slide-out-right {
+    to { transform: translateX(100%); }
+  }
+}
+
+/* Reduced motion: everything snaps. Animations get 1ms rather than none so
+   their end events still fire (the photo panel waits for one). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 0ms !important;
+  }
+}
+
 /* ── Base ───────────────────────────────────────────────────────────  */
 
 html,

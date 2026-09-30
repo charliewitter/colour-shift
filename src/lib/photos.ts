@@ -16,6 +16,11 @@ export function photoSrc(photo: Photo, width = DISPLAY_WIDTH): string {
   return url.toString();
 }
 
+/** The small copy extraction reads. Already cached by then, so it doubles as the blurred preview. */
+export function previewSrc(photo: Photo): string {
+  return photoSrc(photo, EXTRACT_WIDTH);
+}
+
 export async function fetchRandomPhotos(count: number): Promise<Photo[]> {
   const res = await fetch(`/api/photos?count=${count}`);
   if (!res.ok) throw new Error(`Couldn't load photos (${res.status})`);
@@ -37,7 +42,7 @@ export async function extractPair(photo: Photo): Promise<Pair | null> {
   // Loaded on first use: node-vibrant needs the DOM, and keeping it out of the first bundle helps load time.
   const { Vibrant } = await import("node-vibrant/browser");
   try {
-    const palette = await Vibrant.from(photoSrc(photo, EXTRACT_WIDTH)).getPalette();
+    const palette = await Vibrant.from(previewSrc(photo)).getPalette();
     const photoColors: PhotoColor[] = Object.values(palette)
       .filter((swatch) => swatch !== null)
       .map((swatch) => ({ hex: swatch.hex, population: swatch.population }));

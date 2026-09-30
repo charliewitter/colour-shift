@@ -55,14 +55,14 @@ src/
 │   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + Input Mono @font-face + base styles
 ├── components/
 │   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open, photo stream + index + pairs by photo id. Keyboard (Esc, ← →, Space)
-│   ├── stage.tsx           # Colour panel (painted from props) + photo panel
-│   ├── photo-panel.tsx     # Photo (plain <img>), credit, hover arrows
+│   ├── stage.tsx           # Colour panel (painted from props; crossfades only for photo pairs) + photo panel
+│   ├── photo-panel.tsx     # Photo layers (leaving + current) that slide, blurred preview under each, credit, hover arrows
 │   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
 │   ├── dock.tsx            # 2 halves: pickers + swap … method switch | centre | levels + score … photo arrows (export later)
 │   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider
 ├── lib/
 │   ├── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text, pickPair
-│   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing, preloadPhoto, download tracking, extractPair (node-vibrant, lazy-loaded)
+│   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing (photoSrc, previewSrc), preloadPhoto, download tracking, extractPair (node-vibrant, lazy-loaded)
 └── types/
     ├── apca-w3.d.ts        # Hand-written types; apca-w3 ships none
     └── photo.ts            # Photo: what /api/photos returns
@@ -83,6 +83,10 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **A photo's pair sets colours and anchors** (it counts as the user's choice). Pairs are extracted as photos arrive and kept in `pairs` by photo id; the colours follow the current photo's pair *during render* (`pairFor` guard), not in an effect, so photo and pair paint together. ← restores a photo's original pair (edits aren't remembered per photo: that'd be history, out of scope).
 - **Buffer:** an effect keeps `PHOTOS_AHEAD` (3) photos past the current one, fetching `PHOTO_BATCH` (3) at a time; it also does the first load. Each arriving photo is preloaded and extracted once (`prepared` ref). Download tracking fires when a photo is shown, not buffered (`shown` ref).
 - **Keyboard:** one `keydown` listener via `useEffectEvent`. ← → and Space skip inputs/textareas/contenteditable (so a focused slider keeps its arrows) and modifier keys (Cmd+← stays browser back). Space on a focused button presses the button.
+- **Photo slide:** `photo-panel` keeps the outgoing photo in local state (visual-only, set during render) until its `animate-slide-out-*` ends. Direction = stream index up (→, from right) or down (←). Keyframes live in `globals.css` `@theme`. Each layer is keyed by photo id.
+- **Preview** = the 200px extraction copy, blurred, under the full photo until it loads (0.4s fade). `crossOrigin="anonymous"` so it's served from the cache node-vibrant filled. The first photo gets no preview: quick 0.2s fade from the dark panel.
+- **Colour crossfade:** `fadeColors` is true when colours came from a photo, false after any hand edit (slider, level, swap), so hand edits are instant. 0.1s delay + 0.7s so colours trail the slide (user's call: softer than the guide's 0.4s). `START_COLORS` is an empty dark panel (text = bg) so the first pair fades in rather than shifting from grey.
+- **Reduced motion:** global rule in `globals.css`: transitions 0, animations 1ms (not none, so `animationend` still fires and leaving photos get removed).
 - **Space** moves the first unshown photo to just after the current one; if none, fetches a batch and inserts it there. ← always returns.
 - **Photo requests go through `requestPhotos`** in `color-shift.tsx`: a ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo; ~6 calls at start-up).
 - **Run `pnpm dev` in its own Terminal**, not via `! pnpm dev`: Claude Code moves long `!` commands to the background and stops them when memory runs low.

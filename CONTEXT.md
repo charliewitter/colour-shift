@@ -82,6 +82,10 @@ _Avoid_: gallery, feed, carousel
 The photographer's name and Unsplash link, shown on every photo.
 _Avoid_: attribution, caption
 
+**Preview**:
+The small, blurred copy of a photo shown until the full photo has loaded.
+_Avoid_: placeholder, thumbnail, LQIP
+
 **Photo colour**:
 One of the handful of colours found in a photo, with how much of the photo it covers. The pair is picked from these.
 _Avoid_: swatch (that's the square in a colour picker), palette
