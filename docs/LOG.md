@@ -27,7 +27,10 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - A share link costs ~7 Unsplash calls on open (1 by id + buffer).
 
 **Next**
-- Step 6: mobile layout.
+- Step 6: mobile layout. **Waiting on the user's mobile Figma designs** before planning (Figma is the source of truth). When they share the link/node IDs, read them with the Figma MCP (load `skill://figma/figma-design-to-code/SKILL.md` first), then plan.
+- Frames requested (390px wide, desktop layer names reused: `stage`, `dock`, `slider panel`…), in priority order: 1) resting, 2) slider panel open, 3) score levels open, 4) export open, 5) font menu open (if different).
+- Open questions the designs should answer: how the one-row dock fits at 390px (the main problem); stage split and proportions (APP-SPEC: photo on top); photo arrows with no hover (always visible, dock only, or vertical swipe); sample text inset (64px on desktop, too much); photo change motion must be vertical on mobile (style guide).
+- Session habits that worked: plan → approve → build in two parts (A/B) with a browser check and commit each; user runs `pnpm dev` in its own Terminal and `git push` via `!`; offer `/learn` for bigger ideas (sent so far: React setting state during render).
 
 ---
 
