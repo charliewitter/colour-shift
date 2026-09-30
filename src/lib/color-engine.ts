@@ -213,6 +213,49 @@ export function formatScore(text: Color, bg: Color, method: ContrastMethod): str
     : `${grade} Lc ${truncate(value, 1).toFixed(1)}`;
 }
 
+// ── Pairing from a photo ──────────────────────────────────────────────
+
+/** A colour found in a photo (CONTEXT.md: Photo colour), with how many pixels it covers. */
+export type PhotoColor = { hex: string; population: number };
+
+// How much vivid colour counts against raw contrast. OKLCH chroma runs 0–~0.37, log contrast 0–~3,
+// so two strong colours (chroma 0.2 each) are worth about as much as doubling the contrast ratio.
+const VIVID_WEIGHT = 2;
+// Below this a pair barely reads at all (WCAG's Incidental level); only used if nothing better exists.
+const MIN_PAIR_CONTRAST = 1.5;
+
+/**
+ * The most dramatic pair from a photo's colours (APP-SPEC: prefer vivid over muted averages):
+ * every pairing is scored on contrast plus the colourfulness of both colours. The darker colour
+ * becomes the background. A single colour is paired with black or white; none gives null.
+ */
+export function pickPair(photoColors: readonly PhotoColor[]): Pair | null {
+  const colors = photoColors.filter((c) => c.population > 0).map((c) => fromHex(c.hex));
+  if (colors.length === 0) return null;
+  if (colors.length === 1) {
+    const [black, white] = [fromHex("#000000"), fromHex("#ffffff")];
+    colors.push(wcagContrast(colors[0], white) > wcagContrast(colors[0], black) ? white : black);
+  }
+
+  const pairs = colors.flatMap((a, i) => colors.slice(i + 1).map((b) => [a, b] as const));
+  const scored = pairs.map(([a, b]) => {
+    const ratio = wcagContrast(a, b);
+    return { a, b, ratio, score: Math.log(ratio) + VIVID_WEIGHT * (chroma(a) + chroma(b)) };
+  });
+  const readable = scored.filter((p) => p.ratio >= MIN_PAIR_CONTRAST);
+  const best = (readable.length ? readable : scored).reduce((top, p) => (p.score > top.score ? p : top));
+
+  return lightness(best.a) < lightness(best.b) ? { bg: best.a, text: best.b } : { bg: best.b, text: best.a };
+}
+
+function lightness(color: Color): number {
+  return inMode(color, "oklch").l ?? 0;
+}
+
+function chroma(color: Color): number {
+  return inMode(color, "oklch").c ?? 0;
+}
+
 function truncate(value: number, places: number): number {
   const factor = 10 ** places;
   return Math.trunc(value * factor) / factor;

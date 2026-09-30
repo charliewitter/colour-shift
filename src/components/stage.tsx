@@ -1,6 +1,16 @@
+import { PhotoPanel } from "@/components/photo-panel";
+import type { Photo } from "@/types/photo";
+
+type StageProps = {
+  textHex: string;
+  bgHex: string;
+  photo: Photo | null;
+  onPreviousPhoto: () => void;
+  onNextPhoto: () => void;
+};
+
 // Colour panel beside photo panel (CONTEXT.md: Stage).
-// The photo panel stays a placeholder until step 3.
-export function Stage({ textHex, bgHex }: { textHex: string; bgHex: string }) {
+export function Stage({ textHex, bgHex, photo, onPreviousPhoto, onNextPhoto }: StageProps) {
   return (
     <section className="grid min-h-0 flex-1 grid-cols-2">
       <div
@@ -9,7 +19,7 @@ export function Stage({ textHex, bgHex }: { textHex: string; bgHex: string }) {
       >
         <p className="text-8xl leading-[1.05] tracking-tight">Aa</p>
       </div>
-      <div className="bg-surface-raised" />
+      <PhotoPanel photo={photo} onPrevious={onPreviousPhoto} onNext={onNextPhoto} />
     </section>
   );
 }

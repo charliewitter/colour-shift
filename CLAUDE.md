@@ -17,7 +17,7 @@ This is my first project run like this; I'm learning as we go.
 - **Plans** include a "What's going on" section: 2–4 plain-language points on why the step is shaped this way.
 - **After each step**, add a "Worth knowing" note: the 1–2 ideas from the step that will come up again.
 - **Checkpoints for me:**
-  - Have me run the key commands myself (`! pnpm dev` etc.) instead of running them silently.
+  - Have me run the key commands myself instead of running them silently: `pnpm dev` in its own Terminal (see Architecture), one-off commands with `!`.
   - Tell me what to look for when I check in the browser.
   - Point me to one small file to read and explain it.
 - **Going deeper:** if a topic is worth more than a quick note, offer to send it to my learning space with the `learn` skill rather than derailing the build.
@@ -49,19 +49,23 @@ Next.js 16, React 19, TypeScript, Tailwind v4 (config lives in `globals.css`), p
 ```
 src/
 ├── app/
+│   ├── api/photos/route.ts # The only server code: Unsplash proxy (?count, ?id, ?download). Key stays here
 │   ├── layout.tsx          # Root layout: metadata (title "Colour Shift"), Geist Mono fallback font
 │   ├── page.tsx            # Renders <ColorShift /> only
 │   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + Input Mono @font-face + base styles
 ├── components/
-│   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open. Esc handler
-│   ├── stage.tsx           # Colour panel (painted from props) + photo panel (placeholder until step 3)
+│   ├── color-shift.tsx     # Client component holding ALL state: colours + anchors, active colour, colour mode, contrast method, levels open, photos + index. Esc handler
+│   ├── stage.tsx           # Colour panel (painted from props) + photo panel
+│   ├── photo-panel.tsx     # Photo (plain <img>), credit, hover arrows
 │   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
-│   ├── dock.tsx            # 2 halves: pickers + swap … method switch | centre | levels + score … (arrows, export later)
+│   ├── dock.tsx            # 2 halves: pickers + swap … method switch | centre | levels + score … photo arrows (export later)
 │   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider
 ├── lib/
-│   └── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text
+│   ├── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text, pickPair
+│   └── photos.ts           # Browser side of photos: /api/photos calls, Unsplash URL sizing, download tracking, extractPair (node-vibrant, lazy-loaded)
 └── types/
-    └── apca-w3.d.ts        # Hand-written types; apca-w3 ships none
+    ├── apca-w3.d.ts        # Hand-written types; apca-w3 ships none
+    └── photo.ts            # Photo: what /api/photos returns
 public/icons/               # SVG icons downloaded from Figma (committed)
 ```
 
@@ -75,4 +79,8 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **Slider** = invisible native `<input type="range">` on top (drag, keys, a11y) + drawn track/grip beneath. Grip centre travels 12px in from each end to match the 24px native thumb.
 - **Colours from state** are the one allowed inline `style` colour (stage, swatch). Chrome colours always use token classes.
 - **`transition`** uses the style guide's default timing, set via `--default-transition-*` in `@theme`.
+- **Photos are plain `<img>`, not `next/image`.** Unsplash (imgix) resizes via URL params (`photoSrc`); Vercel's optimiser would add cost and a second resize. Extraction reads a 200px copy.
+- **A photo's pair sets colours and anchors** (it counts as the user's choice). Extraction results for a photo no longer showing are dropped.
+- **Photo requests go through `requestPhotos`** in `color-shift.tsx`: a ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo).
+- **Run `pnpm dev` in its own Terminal**, not via `! pnpm dev`: Claude Code moves long `!` commands to the background and stops them when memory runs low.
 - **pnpm** 12.6.0 via corepack, installed to `~/.local/bin` (not `/usr/local/bin`, which needs admin rights). `packageManager` in `package.json` pins the version.

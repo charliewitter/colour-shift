@@ -31,6 +31,8 @@ type DockProps = {
   onSelectRole: (role: Role) => void;
   onSwap: () => void;
   onContrastMethodChange: (method: ContrastMethod) => void;
+  onPreviousPhoto: () => void;
+  onNextPhoto: () => void;
 };
 
 // The bar pinned to the bottom (CONTEXT.md: Dock), laid out as Figma `dock`.
@@ -46,6 +48,8 @@ export function Dock({
   onSelectRole,
   onSwap,
   onContrastMethodChange,
+  onPreviousPhoto,
+  onNextPhoto,
 }: DockProps) {
   const contrast = getContrast(colors.text, colors.bg, contrastMethod);
 
@@ -89,7 +93,15 @@ export function Dock({
         <Score open={levelsOpen} onClick={onToggleLevels}>
           {formatScore(colors.text, colors.bg, contrastMethod)}
         </Score>
-        {/* Photo arrows (step 3) and export (step 5) go here, pushed right with ml-auto. */}
+        {/* Figma `photo arrows`, pushed right. Export (step 5) goes after them. */}
+        <div className="ml-auto flex items-center gap-2">
+          <Button icon aria-label="Previous photo" onClick={onPreviousPhoto}>
+            <Image src="/icons/arrow-left.svg" alt="" width={16} height={16} />
+          </Button>
+          <Button icon aria-label="Next photo" onClick={onNextPhoto}>
+            <Image src="/icons/arrow-right.svg" alt="" width={16} height={16} />
+          </Button>
+        </div>
       </div>
     </footer>
   );

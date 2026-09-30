@@ -4,6 +4,34 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-09-30: Step 3, part A (photos and pairing)
+
+**Done**
+- `/api/photos` route handler: `?count` (one random photo per shuffled search word, 40 words, max 10), `?id` (for share links), `?download` (Unsplash tracking). UTM `colour_shift`. Key never leaves the server.
+- Engine: `pickPair` scores every pair of photo colours on `log(contrast) + 2 × (chroma of both)`, needs ≥ 1.5:1 when possible, darker colour as background. A single colour pairs with black or white, whichever contrasts more.
+- `lib/photos.ts`: Unsplash URL sizing (1600px display, 200px extraction), fetch, download tracking, `extractPair` (node-vibrant, loaded on first use).
+- Photo panel per Figma: photo fills the half, credit bottom-right (`text-value`), 40px arrows on hover/focus. Dock ← → before where EXPORT will go. Arrow icons from Figma.
+- State: `photos` + `photoIndex`. → steps forward, fetching a batch of 3 at the end; ← steps back. Each photo's pair sets colours and anchors. Tracking fires once per photo.
+- Checked in node: sunset, fog, neon and single-colour palettes give sensible pairs. Browser check (user) passed; dev log shows fetches and tracking returning 200.
+
+**Decided**
+- **Focus ring softened** to white 20% (was 30%). User.
+- **Plain `<img>` for photos**, not `next/image` (Unsplash already resizes; Vercel's optimiser would cost more).
+- **No `orientation=landscape`**: the photo panel is nearly square or taller, so landscape photos lost too much to cropping.
+- **Download tracking moved into part A** from B: a few lines, and an Unsplash requirement.
+- **New term: Photo colour** (not "swatch", which is the picker square). Engine type `PhotoColor`.
+- **Run `pnpm dev` in its own Terminal.** `! pnpm dev` gets moved to the background by Claude Code and stopped when memory is low; that is what broke the browser view twice.
+
+**Loose ends**
+- Pink mockup pair shows until the first photo's pair arrives. Part B's preview/crossfade should cover it.
+- `VIVID_WEIGHT` (2) is a first guess. Raise it if pairs lean too much on near-black backgrounds.
+- Demo Unsplash key: 50 calls/hour, ~2 per photo. Apply for production access before deploying (step 8).
+
+**Next**
+- Step 3, part B: buffer of ~3 photos ahead with palettes pre-extracted, keyboard ← → and Space, blurred preview then full photo, photo slide + colour crossfade.
+
+---
+
 ## 2026-09-29: Step 2, part B (levels)
 
 **Done**
