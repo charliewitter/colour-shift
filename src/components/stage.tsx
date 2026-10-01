@@ -1,3 +1,5 @@
+import { useDialKit } from "dialkit";
+import type { CSSProperties } from "react";
 import { PhotoPanel } from "@/components/photo-panel";
 import { SampleText } from "@/components/sample-text";
 import { Dropdown } from "@/components/ui/dropdown";
@@ -40,11 +42,31 @@ export function Stage({
   onPreviousPhoto,
   onNextPhoto,
 }: StageProps) {
+  // Live-tunable motion (DialRoot in color-shift.tsx). Defaults are the values settled on by hand:
+  // colours trail the photo slide slightly, and the sample text fades to 50% on hover.
+  const tuning = useDialKit("Colour panel", {
+    fadeDelay: [100, 0, 500, 10],
+    fadeDuration: [700, 0, 2000, 50],
+    hoverOpacity: [0.5, 0, 1, 0.05],
+  });
+
   return (
     <section className="grid min-h-0 flex-1 grid-cols-2">
       <div
-        className={`relative flex items-center justify-center ${fadeColors ? "transition-colors delay-100 duration-700" : ""}`}
-        style={{ backgroundColor: bgHex, color: textHex }}
+        className={`relative flex items-center justify-center ${fadeColors ? "transition-colors" : ""}`}
+        style={
+          {
+            backgroundColor: bgHex,
+            color: textHex,
+            // Only while fading: transition-property defaults to `all`, so a duration set all the
+            // time would make slider drags lag too.
+            ...(fadeColors && {
+              transitionDelay: `${tuning.fadeDelay}ms`,
+              transitionDuration: `${tuning.fadeDuration}ms`,
+            }),
+            "--sample-hover-opacity": tuning.hoverOpacity,
+          } as CSSProperties
+        }
       >
         <div className="absolute top-4 left-4 z-10">
           <Dropdown

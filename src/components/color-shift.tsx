@@ -1,5 +1,8 @@
 "use client";
 
+import { Agentation } from "agentation";
+import { DialRoot } from "dialkit";
+import "dialkit/styles.css";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Dock } from "@/components/dock";
 import { SliderPanel } from "@/components/slider-panel";
@@ -324,6 +327,16 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
         onCopyUrl={() => copyText(shareUrl())}
         onDownload={downloadMarkdown}
       />
+      {/* DialKit: live tuning panels (e.g. "Colour panel" in stage.tsx). The root hides itself
+          in production builds; the panels' default values still apply there. */}
+      <DialRoot position="top-right" theme="dark" />
+      {/* Agentation: click elements to annotate them, and copy selector-rich feedback for the
+          agent. Dev only: NODE_ENV is replaced at build time, so production drops it entirely.
+          Halfway up on the right, clear of the dock: the toolbar inherits top/bottom from this
+          host element (collapsed it's ~44px tall, hence -22px). */}
+      {process.env.NODE_ENV === "development" && (
+        <Agentation appName="Colour Shift" className="top-[calc(50%-22px)] bottom-auto" />
+      )}
     </main>
   );
 }

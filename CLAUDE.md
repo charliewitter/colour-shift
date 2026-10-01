@@ -36,6 +36,8 @@ This is my first project run like this; I'm learning as we go.
 
 Next.js 16, React 19, TypeScript, Tailwind v4 (config lives in `globals.css`), pnpm, culori, apca-w3, node-vibrant. No GSAP; use CSS transitions only.
 
+Dev tools: **DialKit** (live tuning panels) and **Agentation** (click-to-annotate feedback for the agent). `motion` is installed only as DialKit's peer dependency; the app's own motion stays CSS-only.
+
 > **Next.js 16 has breaking changes.** APIs differ from training data. Before writing Next-specific code, read the relevant guide in `node_modules/next/dist/docs/`.
 
 ## Environment
@@ -99,6 +101,8 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **Opening a share link:** state starts from `shared` via `useState` initialisers (no flash of defaults; hex strings cross the server→client boundary, colours made client-side). The shared photo is fetched first (`waitingForShared` holds the random stream), its pair pre-filled with the shared colours and never extracted (so ← restores them). `keepSharedColors` makes the first photo shown skip its pair once, so shared colours survive even if the shared photo fails. Invalid fields are ignored individually; fg/bg only together.
 - **Sample text hover:** fades to 50% on hover (reads as editable), full while focused. User.
 - **Slider track** uses `bg-origin-border`: otherwise the gradient is sized inside the 1px border and repeats under it.
+- **DialKit** (`dialkit`): one `<DialRoot>` in `color-shift.tsx` (top-right, dark); it hides itself in production builds, but `useDialKit` defaults still apply there, so defaults must be the shipping values. Panel "Colour panel" in `stage.tsx`: crossfade delay/duration (inline, only while `fadeColors`, since `transition-property` defaults to `all`) and sample text hover opacity (`--sample-hover-opacity`). Bake settled values back into code and consider removing DialKit before deploy.
+- **Agentation** (`agentation`, devDependency): `<Agentation>` in `color-shift.tsx`, rendered only when `NODE_ENV === "development"`. Positioned halfway up on the right via `className` on its host (the shadow-DOM toolbar inherits top/bottom). A dragged position is saved in localStorage and overrides this. Paste its copied feedback to the agent; selectors map straight to components.
 - **Photo requests go through `requestPhotos`** in `color-shift.tsx`: returns `null` when skipped (one in flight), `[]` when failed. If the first batch fails, `FALLBACK_COLORS` (muted on surface) fade in, only if nothing has set colours yet. Failures `console.warn` (errors pop Next's dev overlay). A ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo; ~6 calls at start-up).
 - **Run `pnpm dev` in its own Terminal**, not via `! pnpm dev`: Claude Code moves long `!` commands to the background and stops them when memory runs low.
 - **pnpm** 12.6.0 via corepack, installed to `~/.local/bin` (not `/usr/local/bin`, which needs admin rights). `packageManager` in `package.json` pins the version.

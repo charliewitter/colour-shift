@@ -11,6 +11,8 @@
   "dependencies": {
     "apca-w3": "^0.1.9",
     "culori": "^4.0.2",
+    "dialkit": "^2.0.2",
+    "motion": "^13.4.6",
     "next": "16.3.7",
     "node-vibrant": "^4.0.4",
     "react": "19.2.8",
@@ -22,6 +24,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "agentation": "^3.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.7",
     "tailwindcss": "^4",

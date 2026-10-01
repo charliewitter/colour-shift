@@ -95,8 +95,9 @@ export function SampleText({ text, fontFamily, textHex, onChange }: SampleTextPr
         }}
         className={[
           "max-w-full cursor-text text-center leading-[1.05] tracking-[-0.02em] outline-none select-text",
-          // Fades on hover (to 50%) so it reads as editable; back to full while editing.
-          "transition-opacity hover:opacity-50 focus:opacity-100",
+          // Fades on hover (to 50%, tunable in DialKit via stage.tsx) so it reads as editable;
+          // back to full while editing.
+          "transition-opacity hover:opacity-(--sample-hover-opacity,0.5) focus:opacity-100",
           "empty:before:content-['Aa']",
           "selection:bg-[color-mix(in_srgb,var(--sample-color)_20%,transparent)]",
         ].join(" ")}

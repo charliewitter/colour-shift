@@ -4,6 +4,26 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-10-01: Dev tools (DialKit, Agentation)
+
+**Done**
+- DialKit 2.0.2 (+ motion 13.4.6 as its peer): `<DialRoot>` in `color-shift.tsx`; "Colour panel" controls in `stage.tsx` for crossfade delay/duration and sample text hover opacity.
+- Agentation 3.1.2 (dev dependency): dev-only toolbar, halfway up on the right.
+- Lint, types and `pnpm build` pass (build run by the user: auto mode blocks the agent from building right after installing new third-party code).
+
+**Decided**
+- Both are dev tools; app motion stays CSS-only. User.
+- Agentation moved off the dock's corner to halfway up the right. User.
+
+**Loose ends**
+- Before deploy (step 8): bake tuned DialKit values into code and decide whether to remove DialKit (and `motion`) from the bundle.
+- Agentation's own keyboard shortcuts aren't documented; turn them off (`enableKeyboardShortcuts={false}`) if they clash with ← → Space.
+
+**Next**
+- Unchanged: step 6 (mobile layout), waiting on the user's mobile Figma designs. See the step 5 entry for the brief.
+
+---
+
 ## 2026-09-30: Step 5 (copy, share link and export)
 
 **Done**
