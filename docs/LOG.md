@@ -21,7 +21,7 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - Two bars switched by CSS (not JS), so the server render never flips.
 
 **Loose ends**
-- The first deploy landed as Production (Vercel's default for a project's first deploy): behind login, no Unsplash key. Step 8 replaces it.
+- **Project is Git-connected: every push to `main` deploys to Production**, and `colour-shift.vercel.app` is public (Vercel login doesn't cover the production domain on this plan). Production has no Unsplash key yet, so the project is **paused** (production returns 503; previews unaffected). Step 8: add the key to Production, unpause, deploy. Check after the next push that it stays paused.
 - Photo credit on light photos is faint (user: fine for now). Landscape phones are cramped (step 7?).
 - Figma `bottom bar` internals still have `Frame 3x` names and hidden leftovers.
 - iOS app: later, after deploy. Options: PWA (home-screen), Capacitor (wraps this code), SwiftUI (rewrite).
