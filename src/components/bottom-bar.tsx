@@ -4,6 +4,7 @@ import { ExportControls } from "@/components/dock";
 import { Button } from "@/components/ui/button";
 import { Levels } from "@/components/ui/levels";
 import { Reveal } from "@/components/ui/reveal";
+import { RollText } from "@/components/ui/roll-text";
 import { Score } from "@/components/ui/score";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import {
@@ -165,11 +166,13 @@ function SwatchBlock({
       aria-pressed={active}
       onClick={onClick}
       // Hairline edge (like the desktop swatch) so a colour close to the dock's still shows its bounds.
-      className="flex min-w-0 items-center justify-center shadow-[inset_0_0_0_0.5px_var(--cs-swatch-edge)] focus-visible:outline focus-visible:-outline-offset-2 focus-visible:outline-focus"
+      className="flex min-w-0 items-center justify-center shadow-[inset_0_0_0_0.5px_var(--cs-swatch-edge)] transition-colors delay-(--colour-fade-delay) duration-(--colour-fade-duration) focus-visible:outline focus-visible:-outline-offset-2 focus-visible:outline-focus"
       style={{ backgroundColor: hex, color: readableOn(color) }}
     >
       <span className="sr-only">{label}</span>
-      <span className="truncate uppercase">{hex}</span>
+      <span className="truncate uppercase">
+        <RollText>{hex}</RollText>
+      </span>
     </button>
   );
 }

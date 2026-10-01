@@ -1,9 +1,9 @@
 "use client";
 
 import { Agentation } from "agentation";
-import { DialRoot } from "dialkit";
+import { DialRoot, useDialKit } from "dialkit";
 import "dialkit/styles.css";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
 import { BottomBar } from "@/components/bottom-bar";
 import { Dock } from "@/components/dock";
 import { SliderPanel } from "@/components/slider-panel";
@@ -38,6 +38,8 @@ const FALLBACK_COLORS: Pair = {
   text: fromHex("#a39f9f"),
   bg: fromHex("#1a1718"),
 };
+
+type ColorFade = "photo" | "step" | "none";
 
 // Photos fetched per request, and how many to keep loaded ahead of the current one.
 const PHOTO_BATCH = 3;
@@ -84,8 +86,9 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
   );
   // Which photo's pair the colours were last set from (null while the current one is still extracting).
   const [pairFor, setPairFor] = useState<string | null>(null);
-  // True when the colours last came from a photo (they crossfade), false after a hand edit (instant).
-  const [fadeColors, setFadeColors] = useState(false);
+  // How the last colour change should look (CONTEXT.md: Colour fade): a photo's pair crossfades
+  // slowly, a single action (swap, level) quickly, and slider drags are instant so they never lag.
+  const [colorFade, setColorFade] = useState<ColorFade>("none");
   // Shared colours survive the first photo's pair, whichever photo that turns out to be (the
   // shared one, or a random one if the shared photo couldn't load).
   const [keepSharedColors, setKeepSharedColors] = useState(sharedColors !== null);
@@ -106,7 +109,7 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
     if (keepSharedColors) {
       setKeepSharedColors(false);
     } else {
-      setFadeColors(true);
+      setColorFade("photo");
       setColors(pair);
       setAnchors(pair);
     }
@@ -149,7 +152,7 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
       if (batch?.length) setPhotos((current) => [...current, ...batch]);
       else if (batch) {
         // Failed. If nothing has set the colours yet, fade in the fallback pair.
-        setFadeColors(true);
+        setColorFade("photo");
         setColors((current) => (current === START_COLORS ? FALLBACK_COLORS : current));
         setAnchors((current) => (current === START_COLORS ? FALLBACK_COLORS : current));
       }
@@ -208,7 +211,7 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
 
   // The active colour follows its value into the new role (CONTEXT.md: Active colour).
   function swap() {
-    setFadeColors(false);
+    setColorFade("step");
     setColors(({ text, bg }) => ({ text: bg, bg: text }));
     setAnchors(({ text, bg }) => ({ text: bg, bg: text }));
     setActiveRole((current) => (current === "text" ? "bg" : current === "bg" ? "text" : null));
@@ -216,7 +219,7 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
 
   // A slider edit is the user setting the colour: it becomes the new anchor.
   function editColor(role: Role, color: Color) {
-    setFadeColors(false);
+    setColorFade("none");
     setColors((current) => ({ ...current, [role]: color }));
     setAnchors((current) => ({ ...current, [role]: color }));
   }
@@ -225,7 +228,7 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
   // It moves from its anchor, not from wherever the last level click left it.
   function chooseLevel(level: number) {
     const role = activeRole ?? "text";
-    setFadeColors(false);
+    setColorFade("step");
     setColors((current) => {
       const start = { ...current, [role]: anchors[role] };
       return { ...current, [role]: reachLevel(start, role, level, contrastMethod) };
@@ -301,12 +304,43 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
   const textHex = toHex(colors.text);
   const bgHex = toHex(colors.bg);
 
+  // Colour fade timings (ms), live-tunable in DialKit. Defaults are the shipping values.
+  const fade = useDialKit("Colour fade", {
+    photoDelay: [100, 0, 500, 10],
+    photoDuration: [700, 0, 2000, 50],
+    stepDuration: [200, 0, 1000, 10],
+  });
+  // Text roll (ui/roll-text.tsx): score and hex values. Settle = how close together changes count
+  // as "fast" (a drag), which shows them instantly instead of rolling.
+  const roll = useDialKit("Text roll", {
+    duration: [250, 0, 1000, 10],
+    distance: [100, 0, 150, 5],
+    blur: [0, 0, 8, 0.5],
+    stagger: [20, 0, 100, 2],
+    settle: [150, 0, 500, 10],
+  });
+  const [fadeDelay, fadeDuration] =
+    colorFade === "photo" ? [fade.photoDelay, fade.photoDuration] : colorFade === "step" ? [0, fade.stepDuration] : [0, 0];
+
   return (
-    <main className="flex h-dvh flex-col">
+    // Everything painted in the pair (stage, swatches) reads its timing from these two variables.
+    <main
+      className="flex h-dvh flex-col"
+      style={
+        {
+          "--colour-fade-delay": `${fadeDelay}ms`,
+          "--colour-fade-duration": `${fadeDuration}ms`,
+          "--roll-duration": `${roll.duration}ms`,
+          "--roll-distance": `${roll.distance}%`,
+          "--roll-blur": `${roll.blur}px`,
+          "--roll-stagger": `${roll.stagger}ms`,
+          "--roll-settle": roll.settle,
+        } as CSSProperties
+      }
+    >
       <Stage
         textHex={textHex}
         bgHex={bgHex}
-        fadeColors={fadeColors}
         photo={photo}
         photoIndex={photoIndex}
         sampleText={sampleText}

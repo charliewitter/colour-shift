@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { RollText } from "@/components/ui/roll-text";
 
 // Grade + value, e.g. `AA 5.21:1` (CONTEXT.md: Score). Mixed case on purpose: it's data.
 // Standard button states (muted, hover fill, pressed outline); white text while the levels are
@@ -16,7 +17,7 @@ export function Score({
 }) {
   return (
     <Button strong={open} aria-expanded={open} aria-live="polite" onClick={onClick} className={className}>
-      {children}
+      <RollText>{children}</RollText>
     </Button>
   );
 }

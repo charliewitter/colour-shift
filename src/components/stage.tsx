@@ -9,9 +9,6 @@ import type { Photo } from "@/types/photo";
 type StageProps = {
   textHex: string;
   bgHex: string;
-  /** Colours came from a photo: crossfade to them, trailing the photo slightly (0.1s delay, 0.7s).
-   *  Hand edits stay instant so sliders don't lag. */
-  fadeColors: boolean;
   photo: Photo | null;
   photoIndex: number;
   sampleText: string;
@@ -29,7 +26,6 @@ type StageProps = {
 export function Stage({
   textHex,
   bgHex,
-  fadeColors,
   photo,
   photoIndex,
   sampleText,
@@ -43,11 +39,9 @@ export function Stage({
   onNextPhoto,
 }: StageProps) {
   // Live-tunable values (DialRoot in color-shift.tsx). Defaults are the values settled on by hand:
-  // colours trail the photo slide slightly, the sample text fades to 50% on hover, and on mobile
-  // the colour panel keeps at least 160px while panels open below (the photo gives way first).
+  // the sample text fades to 50% on hover, and on mobile the colour panel keeps at least 160px
+  // while panels open below (the photo gives way first).
   const tuning = useDialKit("Colour panel", {
-    fadeDelay: [100, 0, 500, 10],
-    fadeDuration: [700, 0, 2000, 50],
     hoverOpacity: [0.5, 0, 1, 0.05],
     mobileMinHeight: [160, 80, 320, 10],
   });
@@ -59,17 +53,12 @@ export function Stage({
       style={{ "--colour-panel-min": `${tuning.mobileMinHeight}px` } as CSSProperties}
     >
       <div
-        className={`relative flex items-center justify-center ${fadeColors ? "transition-colors" : ""}`}
+        // Colour fade timing comes from <main> (color-shift.tsx): 0ms while dragging.
+        className="relative flex items-center justify-center transition-colors delay-(--colour-fade-delay) duration-(--colour-fade-duration)"
         style={
           {
             backgroundColor: bgHex,
             color: textHex,
-            // Only while fading: transition-property defaults to `all`, so a duration set all the
-            // time would make slider drags lag too.
-            ...(fadeColors && {
-              transitionDelay: `${tuning.fadeDelay}ms`,
-              transitionDuration: `${tuning.fadeDuration}ms`,
-            }),
             "--sample-hover-opacity": tuning.hoverOpacity,
           } as CSSProperties
         }

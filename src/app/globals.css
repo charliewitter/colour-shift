@@ -133,6 +133,27 @@
   @keyframes hold {
     to { opacity: 1; }
   }
+
+  /* Text roll (ui/roll-text.tsx): new value up from below, old one up and out. Timing, distance
+     and blur are CSS variables set from DialKit on <main>. */
+  /* `both`: delayed characters wait hidden at their start position. */
+  --animate-roll-in: roll-in var(--roll-duration, 250ms) cubic-bezier(0.33, 1, 0.68, 1) both;
+  --animate-roll-out: roll-out var(--roll-duration, 250ms) cubic-bezier(0.33, 1, 0.68, 1) forwards;
+
+  @keyframes roll-in {
+    from {
+      transform: translateY(var(--roll-distance, 100%));
+      opacity: 0;
+      filter: blur(var(--roll-blur, 0px));
+    }
+  }
+  @keyframes roll-out {
+    to {
+      transform: translateY(calc(var(--roll-distance, 100%) * -1));
+      opacity: 0;
+      filter: blur(var(--roll-blur, 0px));
+    }
+  }
 }
 
 /* Reduced motion: everything snaps. Animations get 1ms rather than none so
