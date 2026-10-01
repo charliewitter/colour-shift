@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
@@ -23,6 +23,12 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "Colour Shift",
   description: "Find new colour pairings from random photos.",
+};
+
+// viewport-fit=cover: the page runs under the notch and home bar, and the bottom bar pads
+// itself with env(safe-area-inset-bottom) to stay clear of them.
+export const viewport: Viewport = {
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

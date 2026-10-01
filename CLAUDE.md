@@ -2,7 +2,7 @@
 
 One-page web app for finding new colour pairings from random Unsplash photos, with contrast scoring and slider fine-tuning. Full spec: `SPEC.md` (what to build). Build rules + behaviour: `APP-SPEC.md`. Look + motion: `COLOUR-SHIFT-STYLE-GUIDE.md`. Read all three before planning any work. Also read `CONTEXT.md` (glossary: use its terms in docs and code), the top entry of `docs/LOG.md` (latest handoff), and `docs/adr/` (decisions and why).
 
-Design: [Figma, Colour Shift](https://www.figma.com/design/IFKpGTC3reLa2GWP6go6KH/Colour-Shift?node-id=0-1). Source of truth for desktop visuals; wins over the style guide where they differ. Mockup contrast values are illustrative only. Mobile not designed yet.
+Design: [Figma, Colour Shift](https://www.figma.com/design/IFKpGTC3reLa2GWP6go6KH/Colour-Shift?node-id=0-1). Source of truth for visuals (desktop frames, and the `mWeb` section for mobile); wins over the style guide where they differ. Mockup contrast values are illustrative only.
 
 Reference project: `../color-shift` (by MDS). Use it for reference only; don't copy code from it.
 
@@ -52,7 +52,7 @@ Dev tools: **DialKit** (live tuning panels) and **Agentation** (click-to-annotat
 src/
 ├── app/
 │   ├── api/photos/route.ts # The only server code: Unsplash proxy (?count, ?id, ?download). Key stays here
-│   ├── layout.tsx          # Root layout: metadata (title "Colour Shift"), Google fonts (Geist, Geist Mono, Instrument Serif) as CSS variables
+│   ├── layout.tsx          # Root layout: metadata (title "Colour Shift"), viewport-fit=cover, Google fonts (Geist, Geist Mono, Instrument Serif) as CSS variables
 │   ├── page.tsx            # Reads share-link searchParams on the server (parseShare) → <ColorShift shared /> . Makes / dynamic (ƒ)
 │   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + licensed @font-faces (Input Mono, Departure Mono, Alpha Lyrae, Ghost Byte) + slide keyframes + reduced motion + base styles
 ├── components/
@@ -61,7 +61,8 @@ src/
 │   ├── sample-text.tsx     # Editable sample text: plaintext contentEditable (uncontrolled), shrink to fit, 100 chars, "Aa" placeholder
 │   ├── photo-panel.tsx     # Photo layers (leaving + current) that slide, blurred preview under each, credit, hover arrows
 │   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
-│   ├── dock.tsx            # 2 halves: pickers + swap … method switch | centre | levels + score … photo arrows + export (EXPORT ⇄ COPY URL, DOWNLOAD .MD, CLOSE)
+│   ├── bottom-bar.tsx      # Mobile dock (<640px): swatch row (text · swap · bg, active one 2fr) · levels (stretch) · method switch + score + share
+│   ├── dock.tsx            # Desktop only (max-sm:hidden). 2 halves: pickers + swap … method switch | centre | levels + score … photo arrows + export (EXPORT ⇄ COPY URL, DOWNLOAD .MD, CLOSE)
 │   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider, dropdown
 ├── lib/
 │   ├── color-engine.ts     # ALL colour math: hex, colour modes + channels, gamut (max chroma), track gradients, contrast, grades, passing level, reachLevel, score text, exportMarkdown, pickPair
@@ -104,5 +105,10 @@ public/icons/               # SVG icons downloaded from Figma (committed)
 - **DialKit** (`dialkit`): one `<DialRoot>` in `color-shift.tsx` (top-right, dark); it hides itself in production builds, but `useDialKit` defaults still apply there, so defaults must be the shipping values. Panel "Colour panel" in `stage.tsx`: crossfade delay/duration (inline, only while `fadeColors`, since `transition-property` defaults to `all`) and sample text hover opacity (`--sample-hover-opacity`). Bake settled values back into code and consider removing DialKit before deploy.
 - **Agentation** (`agentation`, devDependency): `<Agentation>` in `color-shift.tsx`, rendered only when `NODE_ENV === "development"`. Positioned halfway up on the right via `className` on its host (the shadow-DOM toolbar inherits top/bottom). A dragged position is saved in localStorage and overrides this. Paste its copied feedback to the agent; selectors map straight to components.
 - **Photo requests go through `requestPhotos`** in `color-shift.tsx`: returns `null` when skipped (one in flight), `[]` when failed. If the first batch fails, `FALLBACK_COLORS` (muted on surface) fade in, only if nothing has set colours yet. Failures `console.warn` (errors pop Next's dev overlay). A ref guard allows one in flight, which also stops dev-mode double effects spending API calls (demo key: 50/hour, ~2 per photo; ~6 calls at start-up).
+- **Mobile (<640px, Tailwind `sm`)**: `Dock` (`max-sm:hidden`) and `BottomBar` (`sm:hidden`) are both rendered; CSS picks one, so the server render never flips. Same state, same callbacks. Everything else adapts in place with `max-sm:` (stage rows, sample text inset, dropdown size, photo crossfade, credit). Hover-only things use `pointer-coarse:` (touch), not width: photo arrows always shown, slider touch area +8px above/below. UI text 14px via a `body` media query in `globals.css`.
+- **Mobile stage:** rows `minmax(--colour-panel-min, 1fr) minmax(0, 1fr)`: equal until the colour panel hits its minimum (DialKit "Mobile Min Height", 160px), then the photo gives way. Order in the DOM already matches the stack: colour, photo, slider panel, bar.
+- **Mobile photo change** crossfades: the new layer `animate-fade-in`, the old one `animate-hold` (stays opaque underneath, so its `animationend` still removes it). Desktop still slides.
+- **Swatch hex** is black or white by APCA (`readableOn` in `color-engine`), never the other colour of the pair: stays readable at low contrast.
+- **Layout fills `h-dvh`** (visible area, whatever the browser's toolbars are); the bar is last in the flex column; `env(safe-area-inset-bottom)` clears the home bar. `allowedDevOrigins` in `next.config.ts` lets a phone on the LAN use `pnpm dev`.
 - **Run `pnpm dev` in its own Terminal**, not via `! pnpm dev`: Claude Code moves long `!` commands to the background and stops them when memory runs low.
 - **pnpm** 12.6.0 via corepack, installed to `~/.local/bin` (not `/usr/local/bin`, which needs admin rights). `packageManager` in `package.json` pins the version.

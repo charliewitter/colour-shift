@@ -5,14 +5,17 @@ export function SegmentedControl<T extends string>({
   value,
   onChange,
   label,
+  className = "",
 }: {
   options: readonly { value: T; label: string }[];
   value: T;
   onChange: (value: T) => void;
   label: string;
+  /** Extra classes for the track, e.g. a taller touch size on mobile. */
+  className?: string;
 }) {
   return (
-    <div role="group" aria-label={label} className="flex gap-0.5 rounded-[4px] bg-well p-0.5">
+    <div role="group" aria-label={label} className={`flex gap-0.5 rounded-[4px] bg-well p-0.5 ${className}`}>
       {options.map((option) => {
         const selected = option.value === value;
         return (

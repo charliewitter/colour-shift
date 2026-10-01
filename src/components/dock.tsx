@@ -41,7 +41,8 @@ type DockProps = {
   onDownload: () => void;
 };
 
-// The bar pinned to the bottom (CONTEXT.md: Dock), laid out as Figma `dock`.
+// The bar pinned to the bottom (CONTEXT.md: Dock), laid out as Figma `dock`. Desktop only:
+// below 640px the bottom bar (bottom-bar.tsx) takes its place.
 // Two equal halves with a 24px gap centred on the page: the switch ends 12px left of centre, the levels
 // and score start 12px right of it and grow rightwards, so the switch never moves whatever the score says.
 export function Dock({
@@ -64,7 +65,7 @@ export function Dock({
   const contrast = getContrast(colors.text, colors.bg, contrastMethod);
 
   return (
-    <footer className="grid h-14 shrink-0 grid-cols-2 items-center bg-canvas p-4">
+    <footer className="grid h-14 shrink-0 grid-cols-2 items-center bg-canvas p-4 max-sm:hidden">
       <div className="flex items-center justify-between pr-3">
         <div className="flex items-center">
           <ColorPicker
@@ -125,7 +126,8 @@ type Done = "copy" | "download" | null;
 // EXPORT, or once open: COPY URL, DOWNLOAD .MD, CLOSE (Figma `export`). After an action its
 // label confirms for 1.5s (COPIED, DOWNLOADED). Focus moves to COPY URL on open and back
 // to EXPORT on close, so keyboard users aren't dropped when the buttons swap.
-function ExportControls({
+// Also the bottom bar's fallback when the browser has no share sheet.
+export function ExportControls({
   open,
   onToggle,
   onCopyUrl,

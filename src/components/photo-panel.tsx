@@ -14,8 +14,9 @@ type PhotoPanelProps = {
 type Leaving = { photo: Photo; forward: boolean };
 
 // The current photo (Figma `photo panel`): fills its half of the stage, credit bottom-right,
-// arrows at the sides that show on hover (or keyboard focus). A new photo slides in while the
-// old one slides out; the old one is kept here (visual-only state) until its slide ends.
+// arrows at the sides that show on hover (or keyboard focus), always on touch screens. A new photo
+// slides in while the old one slides out; on mobile it crossfades instead (no sideways motion).
+// The old one is kept here (visual-only state) until its animation ends.
 export function PhotoPanel({ photo, index, onPrevious, onNext }: PhotoPanelProps) {
   const [current, setCurrent] = useState({ photo, index });
   const [leaving, setLeaving] = useState<Leaving | null>(null);
@@ -34,7 +35,7 @@ export function PhotoPanel({ photo, index, onPrevious, onNext }: PhotoPanelProps
         <PhotoLayer
           key={leaving.photo.id}
           photo={leaving.photo}
-          className={leaving.forward ? "animate-slide-out-left" : "animate-slide-out-right"}
+          className={`${leaving.forward ? "animate-slide-out-left" : "animate-slide-out-right"} max-sm:animate-hold`}
           onAnimationEnd={() => setLeaving(null)}
         />
       )}
@@ -43,17 +44,29 @@ export function PhotoPanel({ photo, index, onPrevious, onNext }: PhotoPanelProps
           key={current.photo.id}
           photo={current.photo}
           preview={leaving !== null}
-          className={leaving ? (leaving.forward ? "animate-slide-in-right" : "animate-slide-in-left") : ""}
+          className={leaving ? `${leaving.forward ? "animate-slide-in-right" : "animate-slide-in-left"} max-sm:animate-fade-in` : ""}
         />
       )}
       {photo && (
-        <p className="absolute right-4 bottom-4 text-value">
+        <p className="absolute right-4 bottom-4 text-value max-sm:hidden">
           Photo by{" "}
           <a href={photo.photographerUrl} target="_blank" rel="noreferrer" className="hover:text-strong">
             {photo.photographer}
           </a>{" "}
           on{" "}
           <a href={photo.photoUrl} target="_blank" rel="noreferrer" className="hover:text-strong">
+            Unsplash
+          </a>
+        </p>
+      )}
+      {/* Mobile credit: short form, top-left (Figma `layout=mobile`). */}
+      {photo && (
+        <p className="absolute top-4 left-4 text-xs text-value sm:hidden">
+          <a href={photo.photographerUrl} target="_blank" rel="noreferrer">
+            {photo.photographer}
+          </a>{" "}
+          /{" "}
+          <a href={photo.photoUrl} target="_blank" rel="noreferrer">
             Unsplash
           </a>
         </p>
@@ -113,12 +126,13 @@ function PhotoArrow({ direction, label, onClick }: { direction: "left" | "right"
       onClick={onClick}
       className={[
         "absolute top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-[4px] bg-canvas",
-        "opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100",
+        // Touch screens can't hover, so there the arrows are always shown.
+        "opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100",
         "active:scale-95 focus-visible:outline focus-visible:outline-focus",
         direction === "left" ? "left-4" : "right-4",
       ].join(" ")}
     >
-      <Image src={`/icons/arrow-${direction}.svg`} alt="" width={20} height={20} />
+      <Image src={`/icons/arrow-${direction}.svg`} alt="" width={20} height={20} className="max-sm:size-4" />
     </button>
   );
 }

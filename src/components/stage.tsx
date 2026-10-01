@@ -42,16 +42,22 @@ export function Stage({
   onPreviousPhoto,
   onNextPhoto,
 }: StageProps) {
-  // Live-tunable motion (DialRoot in color-shift.tsx). Defaults are the values settled on by hand:
-  // colours trail the photo slide slightly, and the sample text fades to 50% on hover.
+  // Live-tunable values (DialRoot in color-shift.tsx). Defaults are the values settled on by hand:
+  // colours trail the photo slide slightly, the sample text fades to 50% on hover, and on mobile
+  // the colour panel keeps at least 160px while panels open below (the photo gives way first).
   const tuning = useDialKit("Colour panel", {
     fadeDelay: [100, 0, 500, 10],
     fadeDuration: [700, 0, 2000, 50],
     hoverOpacity: [0.5, 0, 1, 0.05],
+    mobileMinHeight: [160, 80, 320, 10],
   });
 
   return (
-    <section className="grid min-h-0 flex-1 grid-cols-2">
+    // Side by side on desktop; stacked on mobile, colour panel on top (Figma `stage`, layout=mobile).
+    <section
+      className="grid min-h-0 flex-1 grid-cols-2 max-sm:grid-cols-1 max-sm:grid-rows-[minmax(var(--colour-panel-min),1fr)_minmax(0,1fr)]"
+      style={{ "--colour-panel-min": `${tuning.mobileMinHeight}px` } as CSSProperties}
+    >
       <div
         className={`relative flex items-center justify-center ${fadeColors ? "transition-colors" : ""}`}
         style={

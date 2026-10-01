@@ -143,6 +143,16 @@ export function getContrast(text: Color, bg: Color, method: ContrastMethod): num
   return APCAcontrast(sRGBtoY(toRgb255(textHex)), sRGBtoY(toRgb255(bgHex)));
 }
 
+const BLACK = fromHex("#000000");
+const WHITE = fromHex("#ffffff");
+
+/** Black or white, whichever reads better on `bg` (larger APCA Lc). For labels on a user's colour. */
+export function readableOn(bg: Color): "#000000" | "#ffffff" {
+  const onBlack = Math.abs(getContrast(BLACK, bg, "apca"));
+  const onWhite = Math.abs(getContrast(WHITE, bg, "apca"));
+  return onBlack >= onWhite ? "#000000" : "#ffffff";
+}
+
 /** Highest grade the value reaches, or "Fail". APCA grades ignore the sign. */
 export function getGrade(value: number, method: ContrastMethod): string {
   const level = getPassingLevel(value, method);

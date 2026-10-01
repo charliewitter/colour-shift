@@ -62,6 +62,8 @@ export function Dropdown<T extends string>({ label, options, value, open, onTogg
         onClick={onToggle}
         className={[
           "flex items-center gap-1.5 rounded-[4px] bg-surface-control py-1.5 pr-1.5 pl-2 text-value uppercase transition",
+          // 40px tall on mobile, for touch (Figma `layout=mobile`).
+          "max-sm:py-3 max-sm:pr-3 max-sm:pl-4",
           "hover:bg-surface-raised active:scale-95 focus-visible:outline focus-visible:outline-focus",
         ].join(" ")}
       >

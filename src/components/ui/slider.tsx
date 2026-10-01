@@ -49,6 +49,8 @@ export function Slider({ label, value, max, step, gradient, onChange, onRelease 
         onKeyUp={onRelease}
         className={[
           "absolute inset-0 h-full w-full cursor-pointer appearance-none bg-transparent opacity-0",
+          // Touch: 8px more to grab above and below (28px in all); the 20px gap between sliders keeps them apart.
+          "pointer-coarse:-top-2 pointer-coarse:h-[calc(100%+16px)]",
           "[&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:appearance-none",
           "[&::-moz-range-thumb]:size-6",
         ].join(" ")}

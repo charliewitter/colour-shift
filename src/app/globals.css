@@ -121,6 +121,18 @@
   @keyframes slide-out-right {
     to { transform: translateX(100%); }
   }
+
+  /* Mobile: no sideways motion (style guide), so photos crossfade instead. The new photo fades
+     in on top; the old one holds still underneath and is removed when its hold ends. */
+  --animate-fade-in: fade-in 600ms cubic-bezier(0.33, 1, 0.68, 1);
+  --animate-hold: hold 600ms forwards;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+  }
+  @keyframes hold {
+    to { opacity: 1; }
+  }
 }
 
 /* Reduced motion: everything snaps. Animations get 1ms rather than none so
@@ -150,4 +162,11 @@ body {
   font-variant-numeric: tabular-nums;
   user-select: none;
   overflow: hidden;
+}
+
+/* UI text is 14px on mobile (style guide). Same breakpoint as Tailwind's sm. */
+@media (width < 40rem) {
+  body {
+    font-size: 14px;
+  }
 }

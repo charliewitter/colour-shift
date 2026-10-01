@@ -78,7 +78,9 @@ export function SampleText({ text, fontFamily, textHex, onChange }: SampleTextPr
   }
 
   return (
-    <div ref={box} className="absolute inset-16 flex items-center justify-center">
+    // The fit is measured against this box, so its inset is the text's margin: 64px on desktop;
+    // on mobile 24px at the sides and 56px top and bottom (clear of the font dropdown).
+    <div ref={box} className="absolute inset-16 flex items-center justify-center max-sm:inset-x-6 max-sm:inset-y-14">
       <p
         ref={field}
         contentEditable="plaintext-only"

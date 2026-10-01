@@ -4,6 +4,7 @@ import { Agentation } from "agentation";
 import { DialRoot } from "dialkit";
 import "dialkit/styles.css";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { BottomBar } from "@/components/bottom-bar";
 import { Dock } from "@/components/dock";
 import { SliderPanel } from "@/components/slider-panel";
 import { Stage } from "@/components/stage";
@@ -322,6 +323,24 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
         onContrastMethodChange={setContrastMethod}
         onPreviousPhoto={previousPhoto}
         onNextPhoto={nextPhoto}
+        exportOpen={exportOpen}
+        onToggleExport={() => setExportOpen((open) => !open)}
+        onCopyUrl={() => copyText(shareUrl())}
+        onDownload={downloadMarkdown}
+      />
+      {/* Mobile only (the dock hides itself there). Same state; SHARE opens the export options
+          for now, the native share sheet comes in part B. */}
+      <BottomBar
+        colors={colors}
+        activeRole={activeRole}
+        contrastMethod={contrastMethod}
+        levelsOpen={levelsOpen}
+        onToggleLevels={() => setLevelsOpen((open) => !open)}
+        onChooseLevel={chooseLevel}
+        onSelectRole={selectRole}
+        onSwap={swap}
+        onContrastMethodChange={setContrastMethod}
+        onShare={() => setExportOpen(true)}
         exportOpen={exportOpen}
         onToggleExport={() => setExportOpen((open) => !open)}
         onCopyUrl={() => copyText(shareUrl())}
