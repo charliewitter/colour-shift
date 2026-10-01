@@ -17,7 +17,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 | `--cs-canvas` | `#0f0e0f` | Page background, dock, photo arrows |
 | `--cs-surface` | `#1a1718` | Panels |
 | `--cs-surface-raised` | `#262626` | Hover and selected button fill |
-| `--cs-stroke` | `#3e3e3e` at 80% | Selected / pressed button outline (1px, outside) |
+| `--cs-stroke` | `#3e3e3e` at 80% | Selected / pressed button outline (1px, inside) |
 | `--cs-well` | `#000000` | Recessed groups: contrast method switch, level buttons |
 | `--cs-border` | `#1b191a` | Dividers |
 | `--cs-text-muted` | `#a39f9f` | Default button and label text |
@@ -53,8 +53,8 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 |---|---|
 | Default | Transparent, muted text |
 | Hover | `surface-raised` fill, muted text |
-| Pressed (Figma `active`) | `surface-raised` fill + 1px outside `stroke` outline, muted text; scales to 0.95, pops back |
-| Selected | `surface-raised` fill + 1px outside `stroke` outline + strong text |
+| Pressed (Figma `active`) | `surface-raised` fill + 1px inside `stroke` outline, muted text; scales to 0.95, pops back |
+| Selected | `surface-raised` fill + 1px inside `stroke` outline + strong text |
 | Segment selected (WCAG/APCA switch) | `surface-raised` fill + strong text, no outline, inside a `well` track |
 | Focus (keyboard) | 1px ring, white 20% |
 

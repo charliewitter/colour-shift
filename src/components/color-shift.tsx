@@ -7,6 +7,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { BottomBar } from "@/components/bottom-bar";
 import { Dock } from "@/components/dock";
 import { SliderPanel } from "@/components/slider-panel";
+import { Reveal } from "@/components/ui/reveal";
 import { Stage } from "@/components/stage";
 import {
   exportMarkdown,
@@ -62,6 +63,10 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
   // so repeated level clicks never compound gamut losses (docs/adr/0005).
   const [anchors, setAnchors] = useState(sharedColors ?? START_COLORS);
   const [activeRole, setActiveRole] = useState<Role | null>(null);
+  // The colour the slider panel shows: the active one, or while closing, the last one edited
+  // (so its content doesn't change mid-animation). Follows activeRole during render.
+  const [panelRole, setPanelRole] = useState<Role>("text");
+  if (activeRole && activeRole !== panelRole) setPanelRole(activeRole);
   const [colorMode, setColorMode] = useState<ColorMode>("hsb");
   const [contrastMethod, setContrastMethod] = useState<ContrastMethod>(shared.method ?? DEFAULT_METHOD);
   const [levelsOpen, setLevelsOpen] = useState(false);
@@ -317,14 +322,14 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
         onPreviousPhoto={previousPhoto}
         onNextPhoto={nextPhoto}
       />
-      {activeRole && (
+      <Reveal open={activeRole !== null} className="shrink-0">
         <SliderPanel
-          color={colors[activeRole]}
+          color={colors[panelRole]}
           colorMode={colorMode}
-          onColorChange={(color) => editColor(activeRole, color)}
+          onColorChange={(color) => editColor(panelRole, color)}
           onColorModeChange={setColorMode}
         />
-      )}
+      </Reveal>
       <Dock
         colors={colors}
         activeRole={activeRole}

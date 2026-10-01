@@ -9,15 +9,17 @@ export function Levels({
   format,
   onSelect,
   stretch = false,
+  className = "",
 }: {
   levels: readonly number[];
   passing: number | null;
   format: (level: number) => string;
   onSelect: (level: number) => void;
   stretch?: boolean;
+  className?: string;
 }) {
   return (
-    <div role="group" aria-label="Levels" className={`flex items-center gap-1 ${stretch ? "w-full" : ""}`}>
+    <div role="group" aria-label="Levels" className={`flex items-center gap-1 ${stretch ? "w-full" : ""} ${className}`}>
       {levels.map((level) => {
         const selected = level === passing;
         return (

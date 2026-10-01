@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { ExportControls } from "@/components/dock";
 import { Button } from "@/components/ui/button";
 import { Levels } from "@/components/ui/levels";
+import { Reveal } from "@/components/ui/reveal";
 import { Score } from "@/components/ui/score";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import {
@@ -96,16 +97,19 @@ export function BottomBar({
         <SwatchBlock label="Background colour" color={colors.bg} active={activeRole === "bg"} onClick={() => onSelectRole("bg")} />
       </div>
 
-      <div className="flex flex-col gap-4 px-4 py-3">
-        {levelsOpen && (
-          <Levels
-            stretch
-            levels={LEVELS[contrastMethod]}
-            passing={getPassingLevel(contrast, contrastMethod)}
-            format={(level) => formatLevel(level, contrastMethod)}
-            onSelect={onChooseLevel}
-          />
-        )}
+      <div className="flex flex-col px-4 py-3">
+        {/* The 16px gap lives inside the panel, so it collapses with it. */}
+        <Reveal open={levelsOpen}>
+          <div className="pb-4">
+            <Levels
+              stretch
+              levels={LEVELS[contrastMethod]}
+              passing={getPassingLevel(contrast, contrastMethod)}
+              format={(level) => formatLevel(level, contrastMethod)}
+              onSelect={onChooseLevel}
+            />
+          </div>
+        </Reveal>
         <div className="flex h-10 items-center justify-between">
           {exportOpen ? (
             // No share sheet on this device: the desktop export options take over the row.

@@ -15,10 +15,11 @@ export function Button({ icon = false, selected = false, strong = false, classNa
       type="button"
       className={[
         "flex items-center gap-2 rounded-[4px] transition",
-        "hover:bg-surface-raised active:scale-95 active:bg-surface-raised active:outline active:outline-stroke",
+        // Outlines sit 1px inside the edge, so selected/pressed buttons stay the same size as their neighbours (user).
+        "hover:bg-surface-raised active:scale-95 active:bg-surface-raised active:outline active:-outline-offset-1 active:outline-stroke",
         "focus-visible:outline focus-visible:outline-focus",
         icon ? "px-2 py-1.5" : "p-2",
-        selected ? "bg-surface-raised text-strong outline outline-stroke" : strong ? "text-strong" : "text-muted",
+        selected ? "bg-surface-raised text-strong outline -outline-offset-1 outline-stroke" : strong ? "text-strong" : "text-muted",
         className,
       ].join(" ")}
       {...props}

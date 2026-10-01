@@ -22,6 +22,7 @@ This is my first project run like this; I'm learning as we go.
   - Point me to one small file to read and explain it.
 - **Going deeper:** if a topic is worth more than a quick note, offer to send it to my learning space with the `learn` skill rather than derailing the build.
 - Don't explain things I've clearly already got. Keep each note short.
+- **Explanations (incl. answers to "what do you mean?"): a few short bullets, one line each.** No long breakdowns unless I ask for more.
 
 ## How we work
 

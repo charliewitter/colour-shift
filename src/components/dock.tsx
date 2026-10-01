@@ -67,7 +67,8 @@ export function Dock({
   return (
     <footer className="grid h-14 shrink-0 grid-cols-2 items-center bg-canvas p-4 max-sm:hidden">
       <div className="flex items-center justify-between pr-3">
-        <div className="flex items-center">
+        {/* 4px apart so neighbouring hover/selected fills don't touch (user). */}
+        <div className="flex items-center gap-1">
           <ColorPicker
             label="Text colour"
             hex={toHex(colors.text)}
@@ -94,7 +95,10 @@ export function Dock({
 
       <div className="flex items-center gap-6 pl-3">
         {levelsOpen && (
+          // Beside the score, so it opens sideways: a fade and an 8px slide from the left
+          // (@starting-style). Closes instantly, like the font menu.
           <Levels
+            className="transition starting:-translate-x-2 starting:opacity-0"
             levels={LEVELS[contrastMethod]}
             passing={getPassingLevel(contrast, contrastMethod)}
             format={(level) => formatLevel(level, contrastMethod)}
@@ -166,8 +170,9 @@ export function ExportControls({
     );
   }
 
+  // Fades in with a small drop as it replaces EXPORT (@starting-style); closes instantly.
   return (
-    <>
+    <div className="flex items-center gap-[7px] transition starting:-translate-y-1 starting:opacity-0">
       <Button ref={copyButton} onClick={async () => (await onCopyUrl()) && confirm("copy")}>
         <StableLabel label={done === "copy" ? "COPIED" : "COPY URL"} longest="COPY URL" />
       </Button>
@@ -182,7 +187,7 @@ export function ExportControls({
       <Button selected aria-expanded onClick={onToggle}>
         CLOSE
       </Button>
-    </>
+    </div>
   );
 }
 
