@@ -313,11 +313,11 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
   // Text roll (ui/roll-text.tsx): score and hex values. Settle = how close together changes count
   // as "fast" (a drag), which shows them instantly instead of rolling.
   const roll = useDialKit("Text roll", {
-    duration: [250, 0, 1000, 10],
-    distance: [100, 0, 150, 5],
-    blur: [0, 0, 8, 0.5],
-    stagger: [20, 0, 100, 2],
-    settle: [150, 0, 500, 10],
+    duration: [300, 0, 1000, 10],
+    distance: [55, 0, 150, 5],
+    blur: [0.5, 0, 8, 0.5],
+    stagger: [12, 0, 100, 2],
+    settle: [300, 0, 500, 10],
   });
   const [fadeDelay, fadeDuration] =
     colorFade === "photo" ? [fade.photoDelay, fade.photoDuration] : colorFade === "step" ? [0, fade.stepDuration] : [0, 0];

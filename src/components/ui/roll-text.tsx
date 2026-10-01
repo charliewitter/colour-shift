@@ -23,7 +23,7 @@ export function RollText({ children: text }: { children: string }) {
     const el = box.current;
     if (!el) return;
     const now = performance.now();
-    const settle = parseFloat(getComputedStyle(el).getPropertyValue("--roll-settle")) || 150;
+    const settle = parseFloat(getComputedStyle(el).getPropertyValue("--roll-settle")) || 300;
     el.toggleAttribute("data-fast", now - lastChange.current < settle);
     lastChange.current = now;
   }, [current]);
@@ -32,7 +32,8 @@ export function RollText({ children: text }: { children: string }) {
     // One grid cell holds both layers; clipped so the roll stays inside the line. The characters
     // are aria-hidden (split up they'd be read letter by letter); the sr-only copy is what's read.
     // nowrap: the per-character boxes would otherwise let the line break between any two characters.
-    <span ref={box} className="group inline-grid overflow-clip align-top whitespace-nowrap">
+    // text-left: buttons centre text, and mid-roll the cell is as wide as the longer value.
+    <span ref={box} className="group inline-grid overflow-clip text-left align-top whitespace-nowrap">
       <span className="sr-only">{current}</span>
       {leaving !== null && (
         <span
@@ -58,7 +59,7 @@ function Characters({ text, animation }: { text: string; animation: string }) {
     <span
       key={index}
       className={`inline-block whitespace-pre ${animation}`}
-      style={{ animationDelay: `calc(var(--roll-stagger, 0ms) * ${index})` }}
+      style={{ animationDelay: `calc(var(--roll-stagger, 12ms) * ${index})` }}
     >
       {character}
     </span>
