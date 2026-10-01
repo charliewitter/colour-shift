@@ -65,7 +65,9 @@ CSS transitions only.
 - **Default timing:** `0.2s cubic-bezier(0.33, 1, 0.68, 1)`
 - **Colour crossfade:** 0.7s after a 0.1s delay, so the colours trail the photo slightly (softer; changed from ~0.4s on 2026-09-30). Only when colours come from a photo; hand edits are instant. **Photo slide:** 0.6s.
 - **First photo:** no slide and no blurred preview; the photo fades in over 0.2s and the colours fade in from an empty dark panel.
-- **Panels open** with `grid-template-rows: 0fr → 1fr`, a fade, and a small vertical slide.
+- **Panels open and close** with `grid-template-rows: 0fr ↔ 1fr`, a fade, and a 4px vertical slide (slider panel, mobile levels). Desktop levels and export options fade in (levels slide 8px from the left) and close instantly, like the font menu.
+- **Colour fades by kind of change:** photo 0.1s delay + 0.7s; single action (swap, level) 0.2s; slider drag instant.
+- **Rolling values** (score, hex): per character, left to right. 300ms, 55% of the line, 0.5px blur, 12ms stagger. Changes less than 300ms apart show instantly.
 - **Mobile:** vertical motion only. Photos crossfade (0.6s) instead of sliding. The swatch row's widths animate when the active colour changes (a resize, not a slide).
 - **Reduced motion:** respect `prefers-reduced-motion` and turn transitions off.
 

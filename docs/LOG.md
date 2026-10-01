@@ -4,6 +4,31 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-10-01: Step 7 (motion polish), in progress
+
+**Done**
+- 7A: panels animate both ways. `ui/reveal.tsx` (grid row 0fr → 1fr + fade + 4px slide; closed = `inert`) wraps the slider panel and the mobile levels row. Slider panel stays mounted; `panelRole` keeps the last colour while closing. Desktop levels and export options fade in (`starting:`), close instantly.
+- Pickers + swap 4px apart (desktop dock). Selected/pressed outlines moved **inside** (`-outline-offset-1`) so buttons keep their size; Figma updated by user.
+- 7B: colour fade speeds (`colorFade`: photo 0.1s + 0.7s / step 0.2s for swap + level / none for drags) via `--colour-fade-*` on `<main>`; stage, desktop swatches and mobile swatch blocks all follow.
+- 7C: `ui/roll-text.tsx`: score and hex values roll per character, left to right (stagger), on single changes; changes closer than "settle" show instantly (live during drags). Tuned by user: 300ms, 55%, 0.5px blur, 12ms stagger, 300ms settle.
+
+**Decided**
+- Text roll: live while changing fast, roll only single changes (not hold-then-roll). User.
+- Panel fade (200ms, overlaps the grow) is subtle but fine for now. User.
+- Explanations to the user: short bullets (CLAUDE.md). User.
+
+**Loose ends**
+- Still to tune in DialKit, then bake as defaults: "Colour fade" (photo delay/duration, step duration), "Colour panel" (hover opacity, mobile min height, on the phone).
+- A drag's first change may start a roll before "settle" cuts it off (not reported as visible yet).
+- Score box snaps width when a roll ends (could animate width; user happy for now).
+- Still to push: `! git push` (pushes deploy to Production, which is paused; check `colour-shift.vercel.app` still 503 afterwards).
+
+**Next**
+- Finish step 7: remaining DialKit tuning → bake values → style guide motion section → close the step in LOG.
+- Then step 8: deploy (Production Unsplash key, unpause, fonts licensing, DialKit removal decision).
+
+---
+
 ## 2026-10-01: Step 6 (mobile layout)
 
 **Done**

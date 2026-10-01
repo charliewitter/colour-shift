@@ -132,6 +132,14 @@ _Avoid_: colour module, picker panel
 The handle on a slider. It expands on hover and while dragged.
 _Avoid_: gripper, thumb, knob
 
+**Colour fade**:
+How a colour change is shown: slow for a photo's pair, quick for a single action (swap, level), instant while dragging a slider.
+_Avoid_: transition, crossfade (that's the photo change on mobile)
+
+**Roll**:
+How the score and hex values change: the old value slides up and out while the new one comes up from below, character by character. Only single changes roll; fast changes (a drag) show live.
+_Avoid_: ticker, flip, odometer
+
 **Export**:
 The dock control for keeping a pair: copy the share link, or download the Markdown file.
 _Avoid_: share menu, save
