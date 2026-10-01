@@ -21,6 +21,32 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
+export type ShareResult = "shared" | "cancelled" | "unsupported";
+
+/** Opens the device's share sheet with the link and the Markdown file (one call: the browser only
+ *  allows it straight after a tap). Tries the file as Markdown, then as plain text (some browsers
+ *  refuse unfamiliar types), then the link alone. "unsupported" means show our own options instead. */
+export async function shareLink({
+  url,
+  filename,
+  markdown,
+}: {
+  url: string;
+  filename: string;
+  markdown: string;
+}): Promise<ShareResult> {
+  if (typeof navigator.share !== "function") return "unsupported";
+  const files = ["text/markdown", "text/plain"].map((type) => new File([markdown], filename, { type }));
+  const file = files.find((candidate) => navigator.canShare?.({ files: [candidate] }));
+  try {
+    await navigator.share(file ? { files: [file], url } : { url });
+    return "shared";
+  } catch (error) {
+    // AbortError: the person closed the sheet. Anything else (e.g. no permission): fall back.
+    return error instanceof DOMException && error.name === "AbortError" ? "cancelled" : "unsupported";
+  }
+}
+
 /** Saves text as a file via a temporary object URL and a download link. */
 export function downloadText(filename: string, text: string, type = "text/markdown"): void {
   const url = URL.createObjectURL(new Blob([text], { type }));

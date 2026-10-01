@@ -50,21 +50,27 @@ A single-page web app for finding new colour pairings. It shows random Unsplash 
 ```
 Figma names: `stage` (colour panel + photo panel), `slider panel`, `dock` (`panel=none|score|export`), `colour selectors`, `contrast controls` (`contrast method switch` + `score` with its `levels`), `export`, `font dropdown`, `font menu`, `channel readout`.
 
-**Mobile (narrower than 640px).** A starting point, to be explored further. Not designed in Figma yet.
+**Mobile (narrower than 640px).** Figma section `mWeb` (frames `mWeb – resting`, `– score levels`, `– sliders`, `– sliders + editing text`; component `bottom bar`, `state=default|range|sliders`).
 ```
-┌──────────────────────┐
-│   Photo panel        │
-├──────────────────────┤
-│   Colour panel       │
-│   (sample text)      │
-├──────────────────────┤
-│ Slider panel (opens  │
-│ upward when needed)  │
-├──────────────────────┤
-│ Dock, pinned to the  │
-│ bottom of the page   │
-└──────────────────────┘
+┌──────────────────────────┐
+│ [FONT ▾]                 │
+│   Colour panel           │  keeps a minimum height
+├──────────────────────────┤
+│ credit         ←      →  │  Photo panel: shrinks first
+├──────────────────────────┤
+│ Slider panel (when open) │
+├────────┬──────┬──────────┤
+│ #HEX   │  ⇄   │ #HEX     │  Swatch row: active colour 2fr
+├────────┴──────┴──────────┤
+│ 30  45  60  75  90       │  Levels (when open)
+│ WCAG|APCA  [score]   ⇪   │  Share
+└──────────────────────────┘
 ```
+- **Bottom bar** replaces the dock. Swatch row: each colour is a full-height block with its hex in black or white (whichever reads better), and the swap button between them. The active colour's block takes half the width. Score: outlined at rest, filled while the levels are open.
+- **Share** opens the device's share sheet with the share link and the Markdown file. Without a share sheet, the export options (COPY URL, DOWNLOAD .MD, CLOSE) take over the row.
+- **Photo arrows** always show on touch screens. Credit is short (`Name / Unsplash`), top-left. Photos crossfade instead of sliding.
+- **Touch sizes:** controls 40px tall; sliders have a 28px touch area. UI text 14px.
+- Landscape phones and tablets (640px and wider) get the desktop layout for now.
 
 **On screen:**
 - **Colour panel:** background colour, with editable sample text in the fg colour. Starts as "Aa"; empty text shows "Aa". Font dropdown top-left.
@@ -133,7 +139,7 @@ Full detail is in `COLOUR-SHIFT-STYLE-GUIDE.md`. The essentials:
 - `GET /api/photos?id=<id>` fetches one photo, for share links.
 - A small buffer of upcoming photos is preloaded, and their palettes are extracted ahead of time.
 - A tiny blurred/pixelated preview shows first, then the full photo.
-- Changing photo: the photo slides while the colours crossfade at the same time.
+- Changing photo: the photo slides (crossfades on mobile) while the colours crossfade at the same time.
 
 **Pairing**
 - Prefer a vivid, dramatic pair over muted averages.

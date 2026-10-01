@@ -113,8 +113,16 @@ The font the sample text is set in, one of seven.
 _Avoid_: sample font, display font
 
 **Dock**:
-The bar pinned to the bottom holding the colour pickers, contrast controls, photo arrows and export.
+The bar pinned to the bottom holding the colour pickers, contrast controls, photo arrows and export. Desktop only.
 _Avoid_: control bar, controls, toolbar, footer
+
+**Bottom bar**:
+The mobile dock: the swatch row, the levels when open, then the contrast method switch, score and share.
+_Avoid_: mobile dock, tab bar
+
+**Swatch row**:
+The bottom bar's colour pickers: a full-height block per colour with its hex, the swap button between them. The active colour's block is wider.
+_Avoid_: swatches, colour bar
 
 **Slider panel**:
 The panel above the dock with the colour mode tabs and three sliders. It's open exactly when there's an active colour.
@@ -127,6 +135,10 @@ _Avoid_: gripper, thumb, knob
 **Export**:
 The dock control for keeping a pair: copy the share link, or download the Markdown file.
 _Avoid_: share menu, save
+
+**Share**:
+The bottom bar's control for keeping a pair: the device's share sheet, with the share link and the Markdown file. Falls back to the export options.
+_Avoid_: send, export (on mobile)
 
 **Share link**:
 A URL that reopens the same photo, pair, contrast method, specimen font and sample text.

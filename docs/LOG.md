@@ -4,6 +4,33 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-10-01: Step 6 (mobile layout)
+
+**Done**
+- Mobile design review over three rounds (Figma `mWeb`). Frames renamed to their states; `bottom bar` variant property renamed to `state`.
+- 6A: below 640px the stage stacks (colour panel on top, keeps a 160px minimum so the photo shrinks first) and `BottomBar` replaces the dock: swatch row (black/white hex by APCA, active colour 2fr), full-width levels, method switch + score + share. Photos crossfade on mobile; arrows always show on touch (`pointer-coarse`); short credit top-left; 40px controls, 28px slider touch area, 14px UI text; `viewport-fit=cover` + safe-area padding.
+- 6B: share button opens the native share sheet with the link + `.md` (`shareLink`); falls back to the export options. ADR 0006.
+- Vercel project created and linked (`duat3/colour-shift`); `UNSPLASH_ACCESS_KEY` added to Preview only; `.vercelignore` keeps licensed fonts and `.env*` out of uploads. Preview checked on iPhone by the user (layout, share to Messages/Files).
+
+**Decided**
+- Photo crossfade on mobile, not a vertical slide (the ← → arrows would contradict it). User.
+- Native share sheet with link + `.md`; own menu only as fallback. User.
+- Swatch hex in black or white, not the pair's other colour. User.
+- Photo shrinks before the colour panel. User.
+- Layout switches at 640px wide only; landscape phones get desktop for now. User.
+- Two bars switched by CSS (not JS), so the server render never flips.
+
+**Loose ends**
+- The first deploy landed as Production (Vercel's default for a project's first deploy): behind login, no Unsplash key. Step 8 replaces it.
+- Photo credit on light photos is faint (user: fine for now). Landscape phones are cramped (step 7?).
+- Figma `bottom bar` internals still have `Frame 3x` names and hidden leftovers.
+- iOS app: later, after deploy. Options: PWA (home-screen), Capacitor (wraps this code), SwiftUI (rewrite).
+
+**Next**
+- Step 7: motion polish. Mobile minimum height (DialKit) worth tuning on the phone.
+
+---
+
 ## 2026-10-01: Dev tools (DialKit, Agentation)
 
 **Done**

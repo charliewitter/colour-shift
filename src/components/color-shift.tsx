@@ -20,7 +20,7 @@ import {
   type Role,
 } from "@/lib/color-engine";
 import { DEFAULT_FONT, type SpecimenFontId } from "@/lib/fonts";
-import { copyText, downloadText } from "@/lib/export";
+import { copyText, downloadText, shareLink } from "@/lib/export";
 import { DEFAULT_METHOD, DEFAULT_TEXT, shareQuery, type SharedParams } from "@/lib/share";
 import { extractPair, fetchPhoto, fetchRandomPhotos, preloadPhoto, trackDownload } from "@/lib/photos";
 import type { Photo } from "@/types/photo";
@@ -274,9 +274,23 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
     return `${window.location.origin}/?${query}`;
   }
 
+  // The Markdown export: both colours, score, share link and photo credit.
+  function markdownFile() {
+    return {
+      filename: `colour-shift-${toHex(colors.text).slice(1)}-${toHex(colors.bg).slice(1)}.md`,
+      markdown: exportMarkdown({ colors, method: contrastMethod, shareUrl: shareUrl(), credit: photo }),
+    };
+  }
+
   function downloadMarkdown() {
-    const markdown = exportMarkdown({ colors, method: contrastMethod, shareUrl: shareUrl(), credit: photo });
-    downloadText(`colour-shift-${toHex(colors.text).slice(1)}-${toHex(colors.bg).slice(1)}.md`, markdown);
+    const { filename, markdown } = markdownFile();
+    downloadText(filename, markdown);
+  }
+
+  // Mobile share button: the device's share sheet (link + .md). Without one, our export options.
+  async function share() {
+    const result = await shareLink({ url: shareUrl(), ...markdownFile() });
+    if (result === "unsupported") setExportOpen(true);
   }
 
   const textHex = toHex(colors.text);
@@ -328,8 +342,7 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
         onCopyUrl={() => copyText(shareUrl())}
         onDownload={downloadMarkdown}
       />
-      {/* Mobile only (the dock hides itself there). Same state; SHARE opens the export options
-          for now, the native share sheet comes in part B. */}
+      {/* Mobile only (the dock hides itself there). Same state as the dock. */}
       <BottomBar
         colors={colors}
         activeRole={activeRole}
@@ -340,7 +353,7 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
         onSelectRole={selectRole}
         onSwap={swap}
         onContrastMethodChange={setContrastMethod}
-        onShare={() => setExportOpen(true)}
+        onShare={share}
         exportOpen={exportOpen}
         onToggleExport={() => setExportOpen((open) => !open)}
         onCopyUrl={() => copyText(shareUrl())}

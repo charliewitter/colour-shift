@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { ExportControls } from "@/components/dock";
 import { Button } from "@/components/ui/button";
 import { Levels } from "@/components/ui/levels";
@@ -67,6 +68,14 @@ export function BottomBar({
   onDownload,
 }: BottomBarProps) {
   const contrast = getContrast(colors.text, colors.bg, contrastMethod);
+  const shareButton = useRef<HTMLButtonElement>(null);
+  const wasExportOpen = useRef(exportOpen);
+
+  // The export options replace the share button, so closing them hands focus back to it.
+  useEffect(() => {
+    if (wasExportOpen.current && !exportOpen) shareButton.current?.focus();
+    wasExportOpen.current = exportOpen;
+  }, [exportOpen]);
 
   return (
     // Safe-area padding keeps the controls clear of the home bar (layout.tsx: viewport-fit=cover).
@@ -99,7 +108,7 @@ export function BottomBar({
         )}
         <div className="flex h-10 items-center justify-between">
           {exportOpen ? (
-            // No share sheet: the desktop export options take over the row.
+            // No share sheet on this device: the desktop export options take over the row.
             <div className="ml-auto flex items-center gap-[7px]">
               <ExportControls open onToggle={onToggleExport} onCopyUrl={onCopyUrl} onDownload={onDownload} />
             </div>
@@ -121,7 +130,7 @@ export function BottomBar({
                   {formatScore(colors.text, colors.bg, contrastMethod)}
                 </Score>
               </div>
-              <Button icon aria-label="Share" onClick={onShare} className="p-2">
+              <Button ref={shareButton} icon aria-label="Share" onClick={onShare} className="p-2">
                 <Image src="/icons/share.svg" alt="" width={24} height={24} />
               </Button>
             </>

@@ -1,0 +1,8 @@
+# Never uploaded by `vercel deploy`.
+# Licensed fonts: the licences forbid redistribution (docs/adr/0002); the app falls back to free fonts.
+public/fonts/
+# Local secrets: Vercel has its own copies in project settings.
+.env*
+# Build output and dependencies: Vercel installs and builds itself.
+.next/
+node_modules/

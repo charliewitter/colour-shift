@@ -1,0 +1,5 @@
+# Mobile shares through the device's share sheet
+
+On desktop, EXPORT opens our own options: COPY URL and DOWNLOAD .MD. On a phone those are awkward: a downloaded `.md` lands in the Files app, and the share icon the design uses already means "share sheet" on iOS. So the bottom bar's share button calls `navigator.share()` with the share link and the Markdown file. The sheet already offers copy, Save to Files, Messages and AirDrop, so we don't rebuild them.
+
+Constraints that shape the code (`shareLink` in `lib/export.ts`): it only works over HTTPS and only straight after a tap, so nothing slow may run before the call. The file is offered as `text/markdown`, then `text/plain` if the browser refuses that type, then the link alone. Closing the sheet counts as cancelled, not failed; only a missing or refusing share sheet falls back to our export options. Desktop keeps its own menu (a desktop share sheet is less familiar and varies by browser). Checked on iPhone (Messages, Files) on 2026-10-01.
