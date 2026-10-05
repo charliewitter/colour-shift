@@ -53,6 +53,7 @@ No dev tools in the UI: DialKit and Agentation were used for tuning and feedback
 src/
 ├── app/
 │   ├── api/photos/route.ts # The only server code: Unsplash proxy (?count, ?id, ?download). Key stays here
+│   ├── icon.svg            # Favicon (placeholder: colour panel beside photo panel). apple-icon.tsx = same as a 180px PNG for the home screen
 │   ├── layout.tsx          # Root layout: metadata (title "Colour Shift"), viewport-fit=cover, Google fonts (Geist, Geist Mono, Instrument Serif) as CSS variables
 │   ├── page.tsx            # Reads share-link searchParams on the server (parseShare) → <ColorShift shared /> . Makes / dynamic (ƒ)
 │   └── globals.css         # Tailwind v4 + tokens (--cs-*) + @theme mapping + @font-faces (Input Mono, Departure Mono, Alpha Lyrae, Ghost Byte) + slide keyframes + reduced motion + base styles
