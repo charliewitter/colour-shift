@@ -39,7 +39,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 - **Button:** `p-2`, `rounded-[4px]`, label plus optional swatch with `gap-2`.
 - **Swatch:** 12×12px, `rounded-[2px]`, 0.5px `swatch-edge` border on every colour (Figma).
 - **Photo arrows:** two sets doing the same thing. On the photo: 40×40px, `rounded-[4px]`, canvas background, 20px icon, shown on hover. In the dock: 16px ← → icons next to EXPORT.
-- **Dock:** 16px padding (`p-4`). Gaps between controls 4–16px (`gap-1` to `gap-4`).
+- **Dock:** 56px tall, 16px side padding (`px-4`), controls centred vertically (28px buttons, 14px above and below). Gaps between controls 4–16px (`gap-1` to `gap-4`).
 - **Slider:** 12px-tall row. 6px fully rounded track showing a live gradient of that channel, with a 1px inside stroke at white 15%.
 - **Grip** (Figma `grip`, `expanded=false|true`): a 24×24px hit area centred on the track.
   - **Rest:** 8px white dot with a 1px white-10% inside stroke.

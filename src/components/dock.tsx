@@ -66,7 +66,8 @@ export function Dock({
   const contrast = getContrast(colors.text, colors.bg, contrastMethod);
 
   return (
-    <footer className="grid h-14 shrink-0 grid-cols-2 items-center bg-canvas p-4 max-sm:hidden">
+    // Fixed 56px with the controls centred: buttons are 28px, so 16px padding top and bottom pushed them 4px low.
+    <footer className="grid h-14 shrink-0 grid-cols-2 items-center bg-canvas px-4 max-sm:hidden">
       <div className="flex items-center justify-between pr-3">
         {/* 4px apart so neighbouring hover/selected fills don't touch (user). */}
         <div className="flex items-center gap-1">

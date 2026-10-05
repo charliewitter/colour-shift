@@ -13,6 +13,8 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - 7C: `ui/roll-text.tsx`: score and hex values roll per character, left to right (stagger), on single changes; changes closer than "settle" show instantly (live during drags). Tuned by user: 300ms, 55%, 0.5px blur, 12ms stagger, 300ms settle.
 - DialKit "Colour panel" baked: sample text hover 0.65, mobile min height 160. "Colour fade" kept as is (user).
 - EXPORT ⇄ CLOSE is now one toggle button whose label rolls. Rolling text's leaving layer is absolute, so width follows the new value at once (fixes the score box snap too).
+- Export options pop out to the left together (slide + slight overshoot), close instantly (user).
+- Desktop dock controls centred vertically (`px-4`, was `p-4`): 28px buttons had 16px above, 12px below. Style guide updated.
 
 **Decided**
 - Text roll: live while changing fast, roll only single changes (not hold-then-roll). User.
