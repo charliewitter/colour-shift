@@ -42,7 +42,7 @@ export function Stage({
   // the sample text fades to 50% on hover, and on mobile the colour panel keeps at least 160px
   // while panels open below (the photo gives way first).
   const tuning = useDialKit("Colour panel", {
-    hoverOpacity: [0.5, 0, 1, 0.05],
+    hoverOpacity: [0.65, 0, 1, 0.05],
     mobileMinHeight: [160, 80, 320, 10],
   });
 
