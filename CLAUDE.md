@@ -61,7 +61,7 @@ src/
 │   ├── stage.tsx           # Colour panel (painted from props; crossfades only for photo pairs; font dropdown top-left) + photo panel
 │   ├── sample-text.tsx     # Editable sample text: plaintext contentEditable (uncontrolled), shrink to fit, 100 chars, "Aa" placeholder
 │   ├── photo-panel.tsx     # Photo layers (leaving + current) that slide, blurred preview under each, credit, hover arrows
-│   ├── slider-panel.tsx    # Colour mode tabs + channel readout (fades 1s after release) + 3 sliders. Shown iff active colour
+│   ├── slider-panel.tsx    # Colour mode tabs + channel readout (shows on hover/focus/drag, fades 1s after release or leave) + 3 sliders. Shown iff active colour
 │   ├── bottom-bar.tsx      # Mobile dock (<640px): swatch row (text · swap · bg, active one 2fr) · levels (stretch) · method switch + score + share
 │   ├── dock.tsx            # Desktop only (max-sm:hidden). 2 halves: pickers + swap … method switch | centre | levels + score … photo arrows + export (EXPORT ⇄ COPY URL, DOWNLOAD .MD, CLOSE)
 │   └── ui/                 # Small reusable pieces: button, swatch, color-picker, segmented-control, score, levels, slider, dropdown, reveal (panel open/close), roll-text (rolling values)

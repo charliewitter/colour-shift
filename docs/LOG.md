@@ -15,6 +15,7 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - EXPORT ⇄ CLOSE is now one toggle button whose label rolls. Rolling text's leaving layer is absolute, so width follows the new value at once (fixes the score box snap too).
 - Export options pop out to the left together (slide + slight overshoot), close instantly (user).
 - Desktop dock controls centred vertically (`px-4`, was `p-4`): 28px buttons had 16px above, 12px below. Style guide updated.
+- Channel readout also shows on slider hover and focus, so you can see what a slider is before changing it (user).
 
 **Decided**
 - Text roll: live while changing fast, roll only single changes (not hold-then-roll). User.

@@ -8,11 +8,13 @@ type SliderProps = {
   step: number;
   gradient: string;
   onChange: (value: number) => void;
-  /** Pointer or key released: the channel readout starts fading. */
+  /** Hovered or focused: the channel readout shows this slider before anything changes. */
+  onShow: () => void;
+  /** Pointer or key released, pointer left, or focus left: the channel readout starts fading. */
   onRelease: () => void;
 };
 
-export function Slider({ label, value, max, step, gradient, onChange, onRelease }: SliderProps) {
+export function Slider({ label, value, max, step, gradient, onChange, onShow, onRelease }: SliderProps) {
   const fraction = max > 0 ? Math.min(1, value / max) : 0;
 
   return (
@@ -47,6 +49,10 @@ export function Slider({ label, value, max, step, gradient, onChange, onRelease 
         onChange={(event) => onChange(Number(event.target.value))}
         onPointerUp={onRelease}
         onKeyUp={onRelease}
+        onPointerEnter={onShow}
+        onPointerLeave={onRelease}
+        onFocus={onShow}
+        onBlur={onRelease}
         className={[
           "absolute inset-0 h-full w-full cursor-pointer appearance-none bg-transparent opacity-0",
           // Touch: 8px more to grab above and below (28px in all); the 20px gap between sliders keeps them apart.

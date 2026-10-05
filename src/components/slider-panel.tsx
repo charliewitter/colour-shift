@@ -30,17 +30,22 @@ type SliderPanelProps = {
 
 // Colour mode tabs, channel readout and three sliders for the active colour (CONTEXT.md: Slider panel).
 export function SliderPanel({ color, colorMode, onColorChange, onColorModeChange }: SliderPanelProps) {
-  // The readout shows the channel last touched, while in use and for ~1s after release.
+  // The readout shows the channel hovered, focused or last touched, and fades ~1s after release
+  // or once the pointer leaves (so you can see what a slider is before changing it; user).
   const [readoutChannel, setReadoutChannel] = useState<Channel | null>(null);
   const [readoutVisible, setReadoutVisible] = useState(false);
   const fadeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(fadeTimer.current), []);
 
-  function handleChange(channel: Channel, value: number) {
+  function handleShow(channel: Channel) {
     clearTimeout(fadeTimer.current);
     setReadoutChannel(channel);
     setReadoutVisible(true);
+  }
+
+  function handleChange(channel: Channel, value: number) {
+    handleShow(channel);
     onColorChange(setChannel(color, colorMode, channel, value));
   }
 
@@ -89,6 +94,7 @@ export function SliderPanel({ color, colorMode, onColorChange, onColorModeChange
             step={channel.step}
             gradient={channelGradient(color, colorMode, channel)}
             onChange={(value) => handleChange(channel, value)}
+            onShow={() => handleShow(channel)}
             onRelease={handleRelease}
           />
         ))}
