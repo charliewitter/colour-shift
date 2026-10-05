@@ -4,6 +4,22 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-10-05: iOS repo handoff
+
+**Done**
+- New native repo at `/Users/chip/GitHub/colour-shift-ios` (not under git yet). Copied in `PROJECT-MAP.md` and `ios.md` as of `c138c2a`.
+- Its `CLAUDE.md` adapted for iOS: same workflow and teaching rules; SwiftUI stack; invariants in Swift terms; reads research, glossary and ADRs in place from `../colour-shift/` (nothing else copied).
+- `prd.json` there: 36 stories in 8 phases with loop rules (plan → approval → build → checks → owner check → commit), starting at S-001 (initialise the repo).
+
+**Decided**
+- The PRD lives in the iOS repo, not here. User.
+- Backend work for iOS (B-001 `/api/v1/photos`, B-002 rate limit, B-003 Unsplash production access, SH-003 AASA file) happens in this repo as its own planned steps, under this CLAUDE.md.
+
+**Next**
+- Open Claude Code in `colour-shift-ios` and start the `prd.json` loop at S-001.
+
+---
+
 ## 2026-10-05: iOS decisions
 
 **Done**
