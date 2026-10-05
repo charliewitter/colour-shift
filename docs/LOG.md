@@ -4,6 +4,30 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-10-05: Project map
+
+**Done**
+- `PROJECT-MAP.md` (root): the whole web app in detail, written from a full read of the docs and every source file. Covers layout, runtime architecture, state (every `useState`/ref), actions, colour engine (channels, gamut search, WCAG/APCA, `reachLevel`, `pickPair`), `/api/photos`, photo pipeline, share links, export, components, desktop vs mobile, fonts, tokens, motion, a11y, deploy, all decisions, constraints, gaps.
+- Doc drift fixed (listed in the map, §21.2): style guide token table (+7 tokens), dock gaps, icon button padding, address bar tint marked not built; APP-SPEC channel readout, preview, colour fade timing; CLAUDE.md mobile stage `160px`.
+- CLAUDE.md points to the map; README lists it.
+- Revised after outside feedback: §1 now opens with a mental model, core invariants and a "where to change things" table; §4 has diagrams of how `colors`, `anchors`, `pairs` and the share-link flags connect; "pair" defined (map §6.1, CONTEXT.md widened); old §21 split into gaps / quirks and tech debt / doc drift log / what's next (by category); accessibility moved before fonts.
+
+**Decided**
+- When map and code disagree: code wins on descriptions; the map's invariants win, and a contradiction is a possible bug to raise. User.
+- Feedback taken with corrections: two of its "change here" rows were wrong (Markdown is built in `color-engine.ts`, not `export.ts`; photo choice is `route.ts`, pair choice is `pickPair`), and its anchors diagram had slider edits flowing through anchors (they write both). Kept §18.2 (non-ADR decisions), since those were only scattered across the LOG. User.
+- Map lives at the root beside SPEC/APP-SPEC. CLAUDE.md keeps its short Architecture notes; the map is the deep reference, updated in the same commit as structural changes. User.
+- Map is separate from the proposed iOS port docs (`docs/port/`), which can build on it later. User.
+
+**Loose ends**
+- No automated tests (engine checked by hand only).
+- Address bar tint (`theme-color`) not built.
+- Score truncation can under-report by one last digit via floating point (true 1.15 → `1.14`); never over-reports.
+
+**Next**
+- Unchanged from the step 8 entry: Unsplash production access; then the iOS port docs plan (needs approval).
+
+---
+
 ## 2026-10-05: Step 8 (deploy), live
 
 **Done**

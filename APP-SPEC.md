@@ -138,8 +138,8 @@ Full detail is in `COLOUR-SHIFT-STYLE-GUIDE.md`. The essentials:
 - `GET /api/photos?count=N` pulls random photos from a shuffled pool of ~40 varied search words (nature, neon, fog, food, graffiti…). Plain "random" returns too narrow a set.
 - `GET /api/photos?id=<id>` fetches one photo, for share links.
 - A small buffer of upcoming photos is preloaded, and their palettes are extracted ahead of time.
-- A tiny blurred/pixelated preview shows first, then the full photo.
-- Changing photo: the photo slides (crossfades on mobile) while the colours crossfade at the same time.
+- A blurred preview (the 200px copy used for extraction) shows first, then the full photo fades in over it. The first photo has no preview; it fades in quickly.
+- Changing photo: the photo slides (crossfades on mobile) while the colours crossfade, starting a little after it.
 
 **Pairing**
 - Prefer a vivid, dramatic pair over muted averages.
@@ -149,7 +149,7 @@ Full detail is in `COLOUR-SHIFT-STYLE-GUIDE.md`. The essentials:
 - The slider panel only shows when fg or bg is selected. Tap fg or bg → it opens for that colour, and that picker shows its `active` state so it's clear which colour is being edited. Tap the other one → the panel switches colour and stays open. Tap the same one again → closes. Swap while a colour is active → the active selection follows the value into its new role.
 - Switching slider mode doesn't change the colour at all.
 - OKLCH chroma is capped at the maximum in-gamut value for the current lightness and hue.
-- Channel readout (e.g. `SATURATION 56.5`) is hidden by default. It shows while a slider is being dragged or keyboard-adjusted, updates live, and fades out ~1s after release.
+- Channel readout (e.g. `SATURATION 56.5`) is hidden by default. It shows while a slider is hovered, focused, dragged or keyboard-adjusted (so you can see what a slider is before changing it), updates live, and fades out ~1s after release or once the pointer leaves.
 - Tap the score text → threshold levels open or close.
 - The highlighted level is the highest one the pair currently passes. Clicking any level moves the edited colour until the pair just reaches that level (up or down), so every level is one click away. If no colour is selected, the text colour moves. If the level can't be reached (e.g. APCA 90 on mid-grey), the colour moves as far as it can, the score shows what it actually reached, and the passing level stays honest.
 - Tap EXPORT → export options. After an action, the label briefly confirms (`COPY URL` → `COPIED`, `DOWNLOAD .MD` → `DOWNLOADED`), without changing width.

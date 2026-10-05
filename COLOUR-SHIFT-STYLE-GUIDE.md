@@ -22,8 +22,15 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 | `--cs-border` | `#1b191a` | Dividers |
 | `--cs-text-muted` | `#a39f9f` | Default button and label text |
 | `--cs-text-strong` | `#ffffff` | Selected / active text |
+| `--cs-surface-control` | `#212121` | Font dropdown, selected font option |
+| `--cs-text-value` | `#e5e0e0` | Values: channel readout value, photo credit, font dropdown |
 | `--cs-swatch-edge` | `#fafafa` at 30% | Swatch border (0.5px) |
 | `--cs-focus` | `#ffffff` at 20% | Keyboard focus ring |
+| `--cs-track-edge` | `#ffffff` at 15% | Slider track stroke |
+| `--cs-grip` | `#ffffff` | Grip at rest |
+| `--cs-grip-edge` | `#ffffff` at 10% | Grip stroke at rest |
+| `--cs-grip-glass` | `#ffffff` at 20% | Expanded grip fill |
+| `--cs-grip-glass-edge` | `#ffffff` at 40% | Expanded grip stroke |
 
 ## Typography
 
@@ -36,10 +43,10 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 
 ## Shape and spacing
 
-- **Button:** `p-2`, `rounded-[4px]`, label plus optional swatch with `gap-2`.
+- **Button:** `p-2`, `rounded-[4px]`, label plus optional swatch with `gap-2`. Icon-only buttons: `px-2 py-1.5` (Figma `icon button`).
 - **Swatch:** 12×12px, `rounded-[2px]`, 0.5px `swatch-edge` border on every colour (Figma).
 - **Photo arrows:** two sets doing the same thing. On the photo: 40×40px, `rounded-[4px]`, canvas background, 20px icon, shown on hover. In the dock: 16px ← → icons next to EXPORT.
-- **Dock:** 56px tall, 16px side padding (`px-4`), controls centred vertically (28px buttons, 14px above and below). Gaps between controls 4–16px (`gap-1` to `gap-4`).
+- **Dock:** 56px tall, 16px side padding (`px-4`), controls centred vertically (28px buttons, 14px above and below). Gaps between controls 4–24px (`gap-1` to `gap-6`; 24px between the levels, the score and the arrows + export group).
 - **Slider:** 12px-tall row. 6px fully rounded track showing a live gradient of that channel, with a 1px inside stroke at white 15%.
 - **Grip** (Figma `grip`, `expanded=false|true`): a 24×24px hit area centred on the track.
   - **Rest:** 8px white dot with a 1px white-10% inside stroke.
@@ -106,5 +113,5 @@ Values were tuned live (DialKit, steps 6–7) and are now constants in the code:
 
 - UI text isn't selectable, except the sample text while editing it.
 - Selected sample text is tinted with the fg colour at 20%.
-- On mobile Safari, the address bar tint follows the background colour.
+- On mobile Safari, the address bar tint should follow the background colour. **Not built yet:** no `theme-color` is set.
 - Every control has a visible keyboard focus state.

@@ -7,7 +7,7 @@ Figma layer names use these terms too.
 ## Colours
 
 **Pair**:
-The text colour and background colour shown together, the thing the user is hunting for.
+A text colour and a background colour taken together, the thing the user is hunting for. On its own, "the pair" means the one on screen. Other pairs are named for where they come from: a photo's pair (picked from its photo colours), the shared pair (from a share link).
 _Avoid_: palette, combo, scheme
 
 **Text colour**:

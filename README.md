@@ -24,4 +24,4 @@ Input Mono, Alpha Lyrae and Ghost Byte are licensed and aren't in this repo; the
 
 ## Docs
 
-`SPEC.md` (what and why), `APP-SPEC.md` (build rules and behaviour), `COLOUR-SHIFT-STYLE-GUIDE.md` (look and motion), `CONTEXT.md` (glossary), `docs/adr/` (decisions), `docs/LOG.md` (progress log).
+`SPEC.md` (what and why), `APP-SPEC.md` (build rules and behaviour), `COLOUR-SHIFT-STYLE-GUIDE.md` (look and motion), `CONTEXT.md` (glossary), `PROJECT-MAP.md` (the whole codebase in detail), `docs/adr/` (decisions), `docs/LOG.md` (progress log).
