@@ -4,6 +4,28 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-10-05: iOS decisions
+
+**Done**
+- Reviewed Codex's `ios.md` against the research and the code (spot-checked culori `clampChroma` resolution, node-vibrant defaults and weights, Unsplash limits, anchor/`readableOn`/UTF-16 claims): accurate. Committed it with the nine research reports.
+- Worked through the `ios.md` §14 decision register with the owner. Read the owner's iOS Figma frames (page iOS, node 36:5393) and rewrote `ios.md` §9 (layout and glass) around them; recorded all choices in a new §14 "Owner decisions" table; fixed lines that contradicted them (APCA, grip size, floating-bar exclusion).
+
+**Decided** (all owner)
+- iOS 26 minimum; iPhone portrait only; free personal-use app; ship APCA (faithful port, About screen with the W3C notice and compliance statement).
+- Input Mono omitted for v1 (Geist Mono UI). Tracking stays on show. `/api/v1/photos` with a wrapped envelope. One search word per photo.
+- Layout: the iOS Figma frames: full-screen stage, floating glass score pill, colours button and bottom toolbar; system menus and a sheet for editing. Arrows only for photo navigation; sparse haptics; Reduce Motion snaps.
+- Photo upload (the + button): later, not v1. Level list and names unchanged (frame values illustrative). Copy params copies the colour values. Font picked from the sample text area; WCAG/APCA at the top of the level menu.
+
+**Loose ends**
+- The frames label colours "Foreground"; the UI should say Text / Background (glossary).
+- Font licences (Alpha Lyrae, Ghost Byte) still to verify; ADR 0002 may be wrong about them.
+- Photo upload needs its own spec when it's picked up (no credit/tracking, colours-only share links).
+
+**Next**
+- Font licence check (then ADR 0002), or start the native repo: its spec, CLAUDE.md and step 1 (scaffold) per `ios.md` §15.
+
+---
+
 ## 2026-10-05: iOS research handoff
 
 **Done**

@@ -178,7 +178,7 @@ RGB and percentage controls scale internal 0–1 values. Channel edits cap OKLCH
 | Method | Thresholds → labels |
 | --- | --- |
 | WCAG 2 | 1.5 → Incidental; 3.0 → AA Large; 4.5 → AA; 7.0 → AAA; below 1.5 → Fail |
-| APCA, conditional on licence | 30 → Spot; 45 → Headline; 60 → Content; 75 → Body; 90 → Preferred Body; below 30 → Fail |
+| APCA | 30 → Spot; 45 → Headline; 60 → Content; 75 → Body; 90 → Preferred Body; below 30 → Fail |
 
 Incidental is a product convenience, **not a WCAG passing level**; preserve ADR 0004. WCAG uses the piecewise sRGB curve and luminance weights 0.2126/0.7152/0.0722. APCA uses its own pure 2.4-power input conversion and pinned constants; do not feed it WCAG luminance. Retain signed Lc in display, absolute Lc for grades and level search.
 
@@ -190,9 +190,9 @@ Score display truncates toward zero: WCAG two decimals and `:1`, APCA one decima
 
 ### APCA is a release decision, including hidden use
 
-The research flags apca-w3's Limited W3 License and native-use ambiguity. Obtain clarification/permission from Myndex before treating APCA as shippable; otherwise define an approved WCAG-only native scope. This document does not settle licence interpretation. Preserve required notices and compliance text if permission is obtained. See the [research licence section](docs/research/colour-science-swift.md) and [upstream licence](https://github.com/Myndex/apca-w3/blob/master/LICENSE.md).
+The research flags apca-w3's Limited W3 License and native-use ambiguity. **Owner decision (2026-10-05): ship APCA in the free, personal-use app as a faithful port, accepting that ambiguity** (§14). Required: the W3C notice, copyright line and APCA compliance statement in an About/Acknowledgements screen; keep the port in sync with the reference version. A paid version would need Myndex's written commercial licence. See the [research licence section](docs/research/colour-science-swift.md) and [upstream licence](https://github.com/Myndex/apca-w3/blob/master/LICENSE.md).
 
-**Removing the APCA switch alone is insufficient:** web `readableOn` chooses black/white swatch labels using absolute APCA contrast. A WCAG-only build needs an approved alternative there too, plus defined handling of `algo=apca` incoming links. Keep the pair intact even if the method falls back to WCAG; do not claim complete method parity. APCA permission is not needed merely to draft this handoff.
+**If APCA is ever removed (e.g. a paid version without a licence), removing the switch alone is insufficient:** web `readableOn` chooses black/white swatch labels using absolute APCA contrast. A WCAG-only build needs an approved alternative there too, plus defined handling of `algo=apca` incoming links. Keep the pair intact even if the method falls back to WCAG; do not claim complete method parity. APCA permission is not needed merely to draft this handoff.
 
 ## 6. Photo pipeline and pair extraction
 
@@ -289,28 +289,34 @@ Sources: [glass research](docs/research/liquid-glass.md), style guide, Figma, PR
 
 Carry over dark, quiet chrome; only the pair and photo carry product colour. Centralize all named tokens from `COLOUR-SHIFT-STYLE-GUIDE.md` in Swift, including opacity. Use opaque sRGB fills for the colour panel and swatches. Selection/pressed borders remain inside controls so layout does not grow.
 
-### Layout recommendation
+### Layout: the iOS Figma frames (decided 2026-10-05)
 
-Start with the `mWeb` composition on iPhone: colour panel, photo panel, optional slider panel, swatch row, optional levels, method/score/share row. Maintain a readable colour-panel minimum (web reference 160px), letting the photo yield first. Native safe areas and the keyboard replace `h-dvh` and CSS safe-area calculations; keep controls clear of the home indicator.
+The owner's iOS designs are the source of truth: Figma page **iOS**, section `iOS versions` ([node 36:5393](https://www.figma.com/design/IFKpGTC3reLa2GWP6go6KH/Colour-Shift?node-id=36-5393)), six iPhone frames: `iOS/default`, `iOS/active colours`, `iOS/export options`, `iOS/sliders`, `iOS/contrast range`, `iOS/upload options`. They are a native redesign, not a port of the web's mobile bottom bar. Contrast values and hexes in them are illustrative.
 
-Use available geometry and size classes, not a copied 640px breakpoint. Crossfade photos on all iPhone layouts. An iPad regular-width dock, side-by-side stage and directional slide are a recommended later layout step **if iPad is included**; define scope explicitly before enabling universal device support. Compact iPad windows need compact composition. Landscape phones, keyboard-open layouts and large text need checks; they must not accidentally receive an unusable desktop dock.
+- **Stage fills the screen:** colour panel on top with the sample text, photo below, running under the status bar and home indicator. No opaque dock or bottom bar.
+- **Top glass controls:** the **score pill** (grade + value, e.g. `AA Large 4.47:1`) top-left; a **colours button** (sliders icon) top-right.
+- **Bottom glass toolbar** floating over the photo: **share** (left), a **← → capsule** (centre), **+** (right). The small ← → arrows on the photo itself stay too.
+- **Colours button → glass menu:** each colour as a row (swatch, hex, role), each opening the editor; then **Swap**.
+- **Editor → glass sheet** ("Edit Foreground"): close button, OKLCH/HSB/RGB segmented control, three gradient sliders with channel letter and value. The bottom toolbar hides while the sheet is open.
+- **Score pill → glass menu of levels.** The level list and names stay as on the web (the frame's Lc 15 and plain-language labels are illustrative). The **WCAG/APCA switch goes at the top of this menu** (not in the frames).
+- **Share → glass menu:** Share (system sheet), Copy URL, Download .md, **Copy params** (copies the colour values as plain text; exact format decided at the sharing step).
+- **Specimen font:** chosen from the **sample text area** ("Aa") (not in the frames). Exact gesture (tap vs long-press, since tap also edits the text) is decided at the font step.
+- **+ → Camera / Photo Library:** photo upload is **later, not v1**. v1 ships without the + (or with it hidden); see §13.
+- **Terms:** the frames say "Foreground"; the UI should use the glossary's **Text** / **Background** (CONTEXT.md avoids "foreground").
 
-Keep the bottom bar and slider panel stacked below content and opaque. A floating glass bar is a redesign, not required to feel native. Native touch targets should default to at least 44pt, including slider rows, while visual tracks/grips can stay small; the web's 28px rows are not the native sizing requirement.
+iPhone portrait only for v1. Use native safe areas; the colour panel keeps a readable minimum height as on the web.
 
-### Glass policy recommended by the research
+### Glass policy (decided 2026-10-05, from the frames)
 
-| Surface/control | Native treatment |
+| Surface/control | Treatment |
 | --- | --- |
-| Colour panel, sample text, photo content, swatches | Solid content; never glass or user-colour glass tint |
-| Bottom bar/dock, slider panel, swap, method switch, levels, score | Flat token-based chrome |
-| Font picker | Standard SwiftUI `Menu`/menu picker with native presentation and accessibility |
-| Photo arrows over the photo | Candidate for regular `.glass` buttons, grouped appropriately; keep visible on touch |
-| Slider grip | 8pt white dot at rest, 24pt regular interactive glass while dragging; solid fallback if needed |
-| Share/export | System share sheet/sheet, retaining its native background |
+| Colour panel, sample text, photo, swatches inside menus | Solid content. Never glass; never tint glass with a user colour |
+| Score pill, colours button, bottom toolbar buttons, ← → capsule | Glass buttons (`.buttonStyle(.glass)` / `glassEffect`), grouped in a `GlassEffectContainer` where they sit together |
+| Colours, levels, share menus | System `Menu` (glass automatically) |
+| Colour editor | System `.sheet` with detents (glass automatically) |
+| Slider grip | Follow the frame's 36pt knob; check it against the system slider's glass grip |
 
-Never use tinted glass as a colour swatch: its appearance varies with content behind it. System glass may switch light/dark over bright content; forced dark mode is not proven to pin every glass element. Prototype arrows, font trigger and grip over white, black and saturated backgrounds. Check refraction over the gradient and whether the 24pt grip remains clear. Use a flat fallback if it obscures accurate reading.
-
-Do not build custom glass morphing, glass on glass, a tab bar, sidebar, scrolling edge effects or a hero-background extension merely because APIs exist. Avoid copying the research's standalone grip sketch without checking its opacity/layering. Smaller OS-version-specific accessibility APIs still need availability handling even with an iOS 26 floor.
+Prototype the glass controls over white, black and saturated colour panels and busy photos early: glass adapts to what's behind it, and the score pill sits on the user's own colours. Use Reduce Transparency's opaque fallback as the system provides. Don't add custom morphing or tinted glass.
 
 ## 10. Fonts and native text editing
 
@@ -368,7 +374,7 @@ Use SwiftUI transitions/completion cleanup for outgoing content. The web's CSS `
 
 ### Sliders and keys
 
-Draw live gradients and an 8→24pt grip, using a zero-minimum-distance drag for tap/drag control. Clamp position to the usable track, whose grip centre starts/ends 12pt in from the edge; guard narrow/zero geometry and zero chroma range. Animate grip expansion separately from instantaneous value changes.
+Draw live gradients and a grip sized from the iOS Figma frame (36pt knob in `iOS/sliders`), using a zero-minimum-distance drag for tap/drag control. Clamp position to the usable track, whose grip centre starts/ends 12pt in from the edge; guard narrow/zero geometry and zero chroma range. Animate grip expansion separately from instantaneous value changes.
 
 Provide a real adjustable accessibility representation, preferably `accessibilityRepresentation { Slider(...) }`, with channel names, values and appropriate steps. An accessible representation does not alone prove physical keyboard control; test or implement focused arrow adjustment. Show readout on focus/adjustment as well as drag.
 
@@ -428,7 +434,7 @@ If the app is absent, the website already restores the link. No custom fallback 
 
 ## 13. What we are not building
 
-Carry forward the web exclusions: embed mode, locked display/showcase mode, social preview image generation, user photo uploads, user-facing theme search, generated palettes, saved collections and persistent edit history. Session backwards navigation remains included.
+Carry forward the web exclusions: embed mode, locked display/showcase mode, social preview image generation, user photo uploads, user-facing theme search, generated palettes, saved collections and persistent edit history. Session backwards navigation remains included. **Exception:** photo upload from Camera / Photo Library is designed for iOS (the + button in the Figma frames) and planned **after v1**, not excluded. It will need its own spec: on-device extraction, no Unsplash credit or tracking, and share links that carry colours without a photo.
 
 The proposed native first release also excludes:
 
@@ -439,13 +445,41 @@ The proposed native first release also excludes:
 - Exact freshly extracted pairs across different decoders, server-side palette computation, fdlibm ports for bit-identical raw OKLCH or an unapproved gamut/quality change.
 - Font installation/provider capabilities, downloaded fonts, unlicensed Input Mono embedding or a new font-library browser.
 - A custom share destination, share extension, widget, App Clip, Watch app, macOS/Catalyst release or multiwindow workflow.
-- Floating-bar redesign, custom glass morph systems, tab navigation, blanket glass styling, animation dependencies, developer controls or tuning tools in the product UI.
+- Custom glass morph systems, tab navigation, tinted glass, animation dependencies, developer controls or tuning tools in the product UI.
 - App Attest/DeviceCheck, custom authentication/secrets, Redis or other database infrastructure without demonstrated need.
 - Monetisation, ads, wallpaper/download features, an App Store marketing site or a real app-icon design as part of this documentation task.
 
 Scope exceptions that remain necessary: a small Acknowledgements presentation, privacy-policy access for release, signing/configuration, native sharing and associated-domain/backend changes. These support the core product; they do not imply a full settings system. iPad/device orientations and optional gestures/haptics must be decided explicitly rather than silently excluded or added.
 
 ## 14. Decision register and unresolved evidence
+
+### Owner decisions (2026-10-05)
+
+| Decision | Choice |
+| --- | --- |
+| Minimum iOS | **iOS 26** |
+| Devices | **iPhone, portrait only** for v1 |
+| APCA | **Ship APCA** on iOS (faithful port), accepting the licence ambiguity. Include the W3C notice, copyright and APCA compliance statement in an About/Acknowledgements screen |
+| Pricing | **Free, personal use** (TestFlight or a free listing) |
+| Input Mono | **Omit for v1.** Geist Mono for the UI; `font=input-mono` links keep the id but display Geist Mono |
+| Download tracking | **Keep: when shown**, once per photo. Revisit with Unsplash during the production-access application |
+| API shape | **Wrapped envelope** at `/api/v1/photos`: `{ "photos": [...] }`, errors `{ "error": { "code", "message" } }`. Old `/api/photos` stays for the website |
+| Random photos | **Keep one search word per photo** (variety over quota) |
+| Layout and glass | **The iOS Figma frames** (§9): floating glass controls over a full-screen stage |
+| New photo on touch | **Arrows only.** "Jump to a new photo" stays a hardware-keyboard shortcut |
+| Haptics | **Sparse:** discrete events only (level reached, swap, copied); never during drags |
+| Reduce Motion | **Snap**, as on the web |
+| Photo upload (+) | **Later, not v1** |
+| Level list and names | **Unchanged from the web**; the frame's Lc 15 and plain labels are illustrative |
+| Copy params | **Copies the colour values** as plain text; format decided at the sharing step |
+| Font picker / method switch | **Font from the sample text area; WCAG/APCA at the top of the score's level menu** |
+
+Adopted as working defaults (recommended below; change them at their build step if needed): one `@Observable` model + pure `ColorEngine` package; UIKit share sheet bridge for URL + `.md`; universal links on `/` with both colour params, on `colour-shift.vercel.app`; UTF-16-safe 100-character cap; exact fixtures for the engine and extractor, similar-quality pairs for decoded photos; scale chrome with Dynamic Type and test reflow.
+
+Still open: font licence verification (Alpha Lyrae, Ghost Byte); Unsplash production access; cache and rate-limit tuning; device checks listed below.
+
+### Original register
+
 
 These are the choices to resolve in the new spec; **no owner approval is inferred** from this handoff.
 
