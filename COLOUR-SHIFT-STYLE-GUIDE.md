@@ -27,7 +27,7 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 
 ## Typography
 
-- **UI font:** Input Mono, 12px (`text-xs`), `leading-none`. 14px on mobile.
+- **UI font:** Input Mono, 12px (`text-xs`), `leading-none`. 14px on mobile. Where Input Mono isn't installed (it's licensed and never served, ADR 0002), Geist Mono stands in.
 - **Labels are UPPERCASE:** `EXPORT`, `COPY URL`, `DOWNLOAD .MD`, `CLOSE`, `OKLCH`, `HUE`. No labels on the colour pickers; the swatch + hex speaks for itself.
 - **Score text keeps the case the contrast check returns** (`Content Lc 74.9`, `AA Large 4.45:1`). It's data, not a label.
 - **Numbers** use tabular figures so scores don't jiggle.
