@@ -4,6 +4,12 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-10-05: /api/v1/photos for the iOS app (iOS story B-001)
+
+- **Done:** `src/app/api/v1/photos/route.ts` + `src/types/photo-v1.ts`: wrapped `{ photos }` envelope (id lookups return one element), extra fields (`width`, `height`, `color`, `blurHash`), stable error codes, quota → 429 + `Retry-After`, tracking via `/photos/<id>/download?ixid=` built server-side, `no-store` on random/tracking and a cache for id lookups. `/api/photos` untouched. PROJECT-MAP §7.8.
+- **Checked:** `pnpm lint`, `pnpm build`; local `pnpm start`: `?count=1` shape and headers, `?id=bad.id` → 400.
+- **Not deployed:** committed on branch `ios-api-v1`, not pushed (a push to main deploys). Owner: review, merge to main, then open `/api/v1/photos?count=1` on the live site.
+
 ## 2026-10-05: iOS repo handoff
 
 **Done**

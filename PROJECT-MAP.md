@@ -195,7 +195,7 @@ Rules the code must keep. Read these before changing anything. Breaking one is a
 | Contrast, grades, level thresholds | `lib/color-engine.ts` (`getContrast`, `LEVELS`, `GRADES`) | §6.5, APP-SPEC, ADR 0004 |
 | What a level click does | `reachLevel` in `color-engine.ts`; `chooseLevel` in `color-shift.tsx` | §6.6, ADR 0005 |
 | How a pair is picked from a photo | `pickPair` in `color-engine.ts` (`VIVID_WEIGHT`); `extractPair` in `lib/photos.ts` | §6.7, §8.2 |
-| Which photos arrive (search words, batch limit) | `app/api/photos/route.ts` (`SEARCH_WORDS`, `MAX_COUNT`) | §7 |
+| Which photos arrive (search words, batch limit) | `app/api/photos/route.ts` (`SEARCH_WORDS`, `MAX_COUNT`); the iOS copy in `app/api/v1/photos/route.ts` | §7 |
 | Buffer size, ← → and Space behaviour | `color-shift.tsx` (`PHOTO_BATCH`, `PHOTOS_AHEAD`, `nextPhoto`, `jumpPhoto`) | §5, §8.3, §7.6 (API budget) |
 | Photo sizes | `lib/photos.ts` (`DISPLAY_WIDTH`, `EXTRACT_WIDTH`) | §8.1 |
 | Photo slide, preview, credit, arrows | `components/photo-panel.tsx` | §11.2, §16 |
@@ -686,6 +686,21 @@ When the limit is hit, Unsplash returns 403 (`x-ratelimit-remaining: 0`) → the
 
 - `UNSPLASH_ACCESS_KEY` in `.env.local` locally; in Vercel for **Preview** and **Production** (Production stored as a Secret, so it can't be read back).
 - Never `NEXT_PUBLIC_`, never in client code, logs or commits.
+
+### 7.8 `/api/v1/photos` (iOS app)
+
+`src/app/api/v1/photos/route.ts`, types in `src/types/photo-v1.ts`. A frozen contract for the native app (shipped builds can't update with every deploy): **add fields, never rename or remove**; breaking changes need `/api/v2`. The website keeps using `/api/photos`.
+
+| Request | Success | Errors |
+|---|---|---|
+| `?count=N` (1–10) | `200 { photos: PhotoV1[] }`, `no-store` | `429 rate_limited` + `Retry-After: 600` if the quota is used up; `502 upstream_unavailable` |
+| `?id=<id>` | `200 { photos: [one] }`, cacheable (`max-age=3600, s-maxage=86400, stale-while-revalidate=604800`) | `400 invalid_request` (id must match `/^[\w-]{1,64}$/`), `404 not_found`, `429`, `502` |
+| `?download=<id>&ixid=<ixid>` | `200 { ok: true }`, `no-store` | `400`, `429`, `502` |
+
+- `PhotoV1` = `Photo` + `width`, `height`, `color` (nullable), `blurHash` (nullable).
+- Errors are `{ error: { code, message } }`; codes `invalid_request`, `not_found`, `rate_limited`, `upstream_unavailable`, `misconfigured`. Firewall/platform errors may not be JSON; clients handle that.
+- Quota: Unsplash's 403 with `X-Ratelimit-Remaining: 0` (or a 429) maps to `rate_limited`; other 403s don't.
+- Tracking: the server builds `/photos/<id>/download?ixid=<ixid>` itself (same as `links.download_location`); the client only supplies a validated id and the `ixid` from `rawUrl`, so the server never calls arbitrary URLs.
 
 ---
 

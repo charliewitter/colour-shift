@@ -52,7 +52,8 @@ No dev tools in the UI: DialKit and Agentation were used for tuning and feedback
 ```
 src/
 ├── app/
-│   ├── api/photos/route.ts # The only server code: Unsplash proxy (?count, ?id, ?download). Key stays here
+│   ├── api/photos/route.ts # Server code: Unsplash proxy (?count, ?id, ?download). Key stays here
+│   ├── api/v1/photos/route.ts # Frozen v1 contract for the iOS app ({ photos } envelope, error codes, 429). Add fields only (PROJECT-MAP §7.8)
 │   ├── icon.svg            # Favicon (placeholder: colour panel beside photo panel). apple-icon.tsx = same as a 180px PNG for the home screen
 │   ├── layout.tsx          # Root layout: metadata (title "Colour Shift"), viewport-fit=cover, Google fonts (Geist, Geist Mono, Instrument Serif) as CSS variables
 │   ├── page.tsx            # Reads share-link searchParams on the server (parseShare) → <ColorShift shared /> . Makes / dynamic (ƒ)
