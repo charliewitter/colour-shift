@@ -11,6 +11,8 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - Pickers + swap 4px apart (desktop dock). Selected/pressed outlines moved **inside** (`-outline-offset-1`) so buttons keep their size; Figma updated by user.
 - 7B: colour fade speeds (`colorFade`: photo 0.1s + 0.7s / step 0.2s for swap + level / none for drags) via `--colour-fade-*` on `<main>`; stage, desktop swatches and mobile swatch blocks all follow.
 - 7C: `ui/roll-text.tsx`: score and hex values roll per character, left to right (stagger), on single changes; changes closer than "settle" show instantly (live during drags). Tuned by user: 300ms, 55%, 0.5px blur, 12ms stagger, 300ms settle.
+- DialKit "Colour panel" baked: sample text hover 0.65, mobile min height 160. "Colour fade" kept as is (user).
+- EXPORT ⇄ CLOSE is now one toggle button whose label rolls. Rolling text's leaving layer is absolute, so width follows the new value at once (fixes the score box snap too).
 
 **Decided**
 - Text roll: live while changing fast, roll only single changes (not hold-then-roll). User.
@@ -18,13 +20,12 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - Explanations to the user: short bullets (CLAUDE.md). User.
 
 **Loose ends**
-- Still to tune in DialKit, then bake as defaults: "Colour fade" (photo delay/duration, step duration), "Colour panel" (hover opacity, mobile min height, on the phone).
 - A drag's first change may start a roll before "settle" cuts it off (not reported as visible yet).
-- Score box snaps width when a roll ends (could animate width; user happy for now).
-- Still to push: `! git push` (pushes deploy to Production, which is paused; check `colour-shift.vercel.app` still 503 afterwards).
+- A longer leaving value spills briefly into button padding while rolling out (accepted).
+- Check `colour-shift.vercel.app` still 503 (pushed while paused).
 
 **Next**
-- Finish step 7: remaining DialKit tuning → bake values → style guide motion section → close the step in LOG.
+- Finish step 7: style guide motion section → close the step in LOG.
 - Then step 8: deploy (Production Unsplash key, unpause, fonts licensing, DialKit removal decision).
 
 ---

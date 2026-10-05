@@ -29,24 +29,25 @@ export function RollText({ children: text }: { children: string }) {
   }, [current]);
 
   return (
-    // One grid cell holds both layers; clipped so the roll stays inside the line. The characters
-    // are aria-hidden (split up they'd be read letter by letter); the sr-only copy is what's read.
-    // nowrap: the per-character boxes would otherwise let the line break between any two characters.
-    // text-left: buttons centre text, and mid-roll the cell is as wide as the longer value.
-    <span ref={box} className="group inline-grid overflow-clip text-left align-top whitespace-nowrap">
+    // Sized by the current value only: the leaving layer is absolute, so a button wraps the new
+    // word as soon as the roll starts (user). Clipped top and bottom so the roll stays inside the
+    // line; a longer leaving value may spill sideways into the padding while it rolls out.
+    // The characters are aria-hidden (split up they'd be read letter by letter); the sr-only copy
+    // is what's read. nowrap: the per-character boxes would otherwise let the line break anywhere.
+    <span ref={box} className="group relative inline-grid overflow-x-visible overflow-y-clip align-top whitespace-nowrap">
       <span className="sr-only">{current}</span>
       {leaving !== null && (
         <span
           key={`out-${leaving}`}
           aria-hidden
-          className="col-start-1 row-start-1 group-data-fast:hidden"
+          className="absolute top-0 left-0 group-data-fast:hidden"
           // Done when the last (most delayed) character has rolled out.
           onAnimationEnd={(event) => event.target === event.currentTarget.lastElementChild && setLeaving(null)}
         >
           <Characters text={leaving} animation="animate-roll-out" />
         </span>
       )}
-      <span key={current} aria-hidden className="col-start-1 row-start-1">
+      <span key={current} aria-hidden>
         <Characters text={current} animation={leaving !== null ? "animate-roll-in group-data-fast:animate-none" : ""} />
       </span>
     </span>

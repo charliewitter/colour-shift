@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { Levels } from "@/components/ui/levels";
+import { RollText } from "@/components/ui/roll-text";
 import { Score } from "@/components/ui/score";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import {
@@ -129,7 +130,7 @@ type Done = "copy" | "download" | null;
 
 // EXPORT, or once open: COPY URL, DOWNLOAD .MD, CLOSE (Figma `export`). After an action its
 // label confirms for 1.5s (COPIED, DOWNLOADED). Focus moves to COPY URL on open and back
-// to EXPORT on close, so keyboard users aren't dropped when the buttons swap.
+// to EXPORT on close (Esc unmounts a focused option), so keyboard users aren't dropped.
 // Also the bottom bar's fallback when the browser has no share sheet.
 export function ExportControls({
   open,
@@ -162,30 +163,27 @@ export function ExportControls({
     timer.current = window.setTimeout(() => setDone(null), 1500);
   }
 
-  if (!open) {
-    return (
-      <Button ref={exportButton} aria-expanded={false} onClick={onToggle}>
-        EXPORT
-      </Button>
-    );
-  }
-
-  // Fades in with a small drop as it replaces EXPORT (@starting-style); closes instantly.
+  // One toggle button that stays put: its label rolls EXPORT ⇄ CLOSE. The options fade in with
+  // a small drop to its left (@starting-style) and close instantly.
   return (
-    <div className="flex items-center gap-[7px] transition starting:-translate-y-1 starting:opacity-0">
-      <Button ref={copyButton} onClick={async () => (await onCopyUrl()) && confirm("copy")}>
-        <StableLabel label={done === "copy" ? "COPIED" : "COPY URL"} longest="COPY URL" />
-      </Button>
-      <Button
-        onClick={() => {
-          onDownload();
-          confirm("download");
-        }}
-      >
-        <StableLabel label={done === "download" ? "DOWNLOADED" : "DOWNLOAD .MD"} longest="DOWNLOAD .MD" />
-      </Button>
-      <Button selected aria-expanded onClick={onToggle}>
-        CLOSE
+    <div className="flex items-center gap-[7px]">
+      {open && (
+        <div className="flex items-center gap-[7px] transition starting:-translate-y-1 starting:opacity-0">
+          <Button ref={copyButton} onClick={async () => (await onCopyUrl()) && confirm("copy")}>
+            <StableLabel label={done === "copy" ? "COPIED" : "COPY URL"} longest="COPY URL" />
+          </Button>
+          <Button
+            onClick={() => {
+              onDownload();
+              confirm("download");
+            }}
+          >
+            <StableLabel label={done === "download" ? "DOWNLOADED" : "DOWNLOAD .MD"} longest="DOWNLOAD .MD" />
+          </Button>
+        </div>
+      )}
+      <Button ref={exportButton} selected={open} aria-expanded={open} onClick={onToggle}>
+        <RollText>{open ? "CLOSE" : "EXPORT"}</RollText>
       </Button>
     </div>
   );
