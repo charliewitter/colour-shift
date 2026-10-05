@@ -3,7 +3,12 @@ import { useLayoutEffect, useRef, useState } from "react";
 // Text that rolls when it changes (CONTEXT.md: Roll): the old value slides up and out while the
 // new one comes up from below. Only single changes roll. While the value is changing fast (a
 // slider drag), each change lands instantly so you can watch it live.
-// Timing and distance come from CSS variables on <main> (DialKit "Text roll" in color-shift.tsx).
+// Timing and distance: the roll-in/roll-out keyframes in globals.css.
+
+// Changes closer together than this count as "fast" (a drag) and show instantly.
+const ROLL_SETTLE_MS = 300;
+const ROLL_STAGGER_MS = 12;
+
 export function RollText({ children: text }: { children: string }) {
   const [current, setCurrent] = useState(text);
   const [leaving, setLeaving] = useState<string | null>(null);
@@ -17,14 +22,13 @@ export function RollText({ children: text }: { children: string }) {
     setCurrent(text);
   }
 
-  // Fast or slow? Changes closer together than --roll-settle (ms) are "fast": data-fast turns the
+  // Fast or slow? Changes closer together than ROLL_SETTLE_MS are "fast": data-fast turns the
   // animation off and hides the leaving layer. Runs before paint, so a fast change never flickers.
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
     const now = performance.now();
-    const settle = parseFloat(getComputedStyle(el).getPropertyValue("--roll-settle")) || 300;
-    el.toggleAttribute("data-fast", now - lastChange.current < settle);
+    el.toggleAttribute("data-fast", now - lastChange.current < ROLL_SETTLE_MS);
     lastChange.current = now;
   }, [current]);
 
@@ -54,13 +58,13 @@ export function RollText({ children: text }: { children: string }) {
   );
 }
 
-// One span per character, each starting --roll-stagger later than the one before: the wave.
+// One span per character, each starting ROLL_STAGGER_MS later than the one before: the wave.
 function Characters({ text, animation }: { text: string; animation: string }) {
   return [...text].map((character, index) => (
     <span
       key={index}
       className={`inline-block whitespace-pre ${animation}`}
-      style={{ animationDelay: `calc(var(--roll-stagger, 12ms) * ${index})` }}
+      style={{ animationDelay: `${ROLL_STAGGER_MS * index}ms` }}
     >
       {character}
     </span>

@@ -1,8 +1,5 @@
 "use client";
 
-import { Agentation } from "agentation";
-import { DialRoot, useDialKit } from "dialkit";
-import "dialkit/styles.css";
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
 import { BottomBar } from "@/components/bottom-bar";
 import { Dock } from "@/components/dock";
@@ -40,6 +37,14 @@ const FALLBACK_COLORS: Pair = {
 };
 
 type ColorFade = "photo" | "step" | "none";
+
+// Colour fade [delay, duration] in ms by kind of change: a photo's pair trails the photo slide;
+// a single action (swap, level) is quick; a slider drag is instant.
+const COLOR_FADE_MS: Record<ColorFade, [number, number]> = {
+  photo: [100, 700],
+  step: [0, 200],
+  none: [0, 0],
+};
 
 // Photos fetched per request, and how many to keep loaded ahead of the current one.
 const PHOTO_BATCH = 3;
@@ -304,23 +309,7 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
   const textHex = toHex(colors.text);
   const bgHex = toHex(colors.bg);
 
-  // Colour fade timings (ms), live-tunable in DialKit. Defaults are the shipping values.
-  const fade = useDialKit("Colour fade", {
-    photoDelay: [100, 0, 500, 10],
-    photoDuration: [700, 0, 2000, 50],
-    stepDuration: [200, 0, 1000, 10],
-  });
-  // Text roll (ui/roll-text.tsx): score and hex values. Settle = how close together changes count
-  // as "fast" (a drag), which shows them instantly instead of rolling.
-  const roll = useDialKit("Text roll", {
-    duration: [300, 0, 1000, 10],
-    distance: [55, 0, 150, 5],
-    blur: [0.5, 0, 8, 0.5],
-    stagger: [12, 0, 100, 2],
-    settle: [300, 0, 500, 10],
-  });
-  const [fadeDelay, fadeDuration] =
-    colorFade === "photo" ? [fade.photoDelay, fade.photoDuration] : colorFade === "step" ? [0, fade.stepDuration] : [0, 0];
+  const [fadeDelay, fadeDuration] = COLOR_FADE_MS[colorFade];
 
   return (
     // Everything painted in the pair (stage, swatches) reads its timing from these two variables.
@@ -330,11 +319,6 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
         {
           "--colour-fade-delay": `${fadeDelay}ms`,
           "--colour-fade-duration": `${fadeDuration}ms`,
-          "--roll-duration": `${roll.duration}ms`,
-          "--roll-distance": `${roll.distance}%`,
-          "--roll-blur": `${roll.blur}px`,
-          "--roll-stagger": `${roll.stagger}ms`,
-          "--roll-settle": roll.settle,
         } as CSSProperties
       }
     >
@@ -398,16 +382,6 @@ export function ColorShift({ shared }: { shared: SharedParams }) {
         onCopyUrl={() => copyText(shareUrl())}
         onDownload={downloadMarkdown}
       />
-      {/* DialKit: live tuning panels (e.g. "Colour panel" in stage.tsx). The root hides itself
-          in production builds; the panels' default values still apply there. */}
-      <DialRoot position="top-right" theme="dark" />
-      {/* Agentation: click elements to annotate them, and copy selector-rich feedback for the
-          agent. Dev only: NODE_ENV is replaced at build time, so production drops it entirely.
-          Halfway up on the right, clear of the dock: the toolbar inherits top/bottom from this
-          host element (collapsed it's ~44px tall, hence -22px). */}
-      {process.env.NODE_ENV === "development" && (
-        <Agentation appName="Colour Shift" className="top-[calc(50%-22px)] bottom-auto" />
-      )}
     </main>
   );
 }

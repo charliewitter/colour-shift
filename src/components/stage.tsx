@@ -1,4 +1,3 @@
-import { useDialKit } from "dialkit";
 import type { CSSProperties } from "react";
 import { PhotoPanel } from "@/components/photo-panel";
 import { SampleText } from "@/components/sample-text";
@@ -38,20 +37,10 @@ export function Stage({
   onPreviousPhoto,
   onNextPhoto,
 }: StageProps) {
-  // Live-tunable values (DialRoot in color-shift.tsx). Defaults are the values settled on by hand:
-  // the sample text fades to 50% on hover, and on mobile the colour panel keeps at least 160px
-  // while panels open below (the photo gives way first).
-  const tuning = useDialKit("Colour panel", {
-    hoverOpacity: [0.65, 0, 1, 0.05],
-    mobileMinHeight: [160, 80, 320, 10],
-  });
-
   return (
     // Side by side on desktop; stacked on mobile, colour panel on top (Figma `stage`, layout=mobile).
-    <section
-      className="grid min-h-0 flex-1 grid-cols-2 max-sm:grid-cols-1 max-sm:grid-rows-[minmax(var(--colour-panel-min),1fr)_minmax(0,1fr)]"
-      style={{ "--colour-panel-min": `${tuning.mobileMinHeight}px` } as CSSProperties}
-    >
+    // On mobile the colour panel keeps at least 160px while panels open below; the photo gives way first.
+    <section className="grid min-h-0 flex-1 grid-cols-2 max-sm:grid-cols-1 max-sm:grid-rows-[minmax(160px,1fr)_minmax(0,1fr)]">
       <div
         // Colour fade timing comes from <main> (color-shift.tsx): 0ms while dragging.
         className="relative flex items-center justify-center transition-colors delay-(--colour-fade-delay) duration-(--colour-fade-duration)"
@@ -59,7 +48,6 @@ export function Stage({
           {
             backgroundColor: bgHex,
             color: textHex,
-            "--sample-hover-opacity": tuning.hoverOpacity,
           } as CSSProperties
         }
       >

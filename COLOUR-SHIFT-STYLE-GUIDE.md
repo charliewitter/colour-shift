@@ -83,7 +83,7 @@ CSS only: transitions, `@starting-style` and keyframes (no GSAP). Motion is quic
 | Full photo over its blurred preview | 400ms | ease-out |
 | Channel readout fade-out | 200ms, after 1s | ease-out |
 
-The shipping values come from DialKit tuning; its panels hold the same numbers as defaults.
+Values were tuned live (DialKit, steps 6–7) and are now constants in the code: `COLOR_FADE_MS` (color-shift.tsx), the roll keyframes (globals.css) and `ROLL_*_MS` (roll-text.tsx). Change both together.
 
 **Pieces**
 
