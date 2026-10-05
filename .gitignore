@@ -28,8 +28,10 @@ pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# licensed fonts: local use only, never commit (public repo; web licence needed before deploy)
-public/fonts/
+# licensed fonts: local use only, never commit (public repo, ADR 0002).
+# Departure Mono is SIL OFL, so it's committed with its licence.
+public/fonts/*
+!public/fonts/DepartureMono-*
 
 # testing
 /coverage

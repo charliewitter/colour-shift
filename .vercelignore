@@ -1,6 +1,8 @@
 # Never uploaded by `vercel deploy`.
-# Licensed fonts: the licences forbid redistribution (docs/adr/0002); the app falls back to free fonts.
-public/fonts/
+# Licensed fonts: the licences forbid redistribution (docs/adr/0002); the live site uses local() copies
+# installed on the viewer's machine, else free fallbacks. Departure Mono (SIL OFL) is uploaded.
+public/fonts/*
+!public/fonts/DepartureMono-*
 # Local secrets: Vercel has its own copies in project settings.
 .env*
 # Build output and dependencies: Vercel installs and builds itself.

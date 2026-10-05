@@ -1,26 +1,29 @@
 @import "tailwindcss";
 
 /* ── Fonts ──────────────────────────────────────────────────────────
-   Input Mono is licensed and local-only (docs/adr/0002). The files live in
-   the gitignored public/fonts/. If they're missing, the browser falls back
-   to Geist Mono, loaded in layout.tsx as --font-geist-mono. */
+   Input Mono is licensed and never uploaded (docs/adr/0002). local() uses a
+   copy installed on the viewer's machine (so the live site shows it to the
+   owner); the url() file exists only in local dev (gitignored public/fonts/).
+   Otherwise the browser falls back to Geist Mono (layout.tsx, --font-geist-mono). */
 
 @font-face {
   font-family: "Input Mono";
-  src: url("/fonts/InputMono-Regular.ttf") format("truetype");
+  src: local("Input Mono"), local("InputMono-Regular"), url("/fonts/InputMono-Regular.ttf") format("truetype");
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Input Mono";
-  src: url("/fonts/InputMono-Bold.ttf") format("truetype");
+  src: local("InputMono Bold"), local("InputMono-Bold"), url("/fonts/InputMono-Bold.ttf") format("truetype");
   font-weight: 700;
   font-display: swap;
 }
 
-/* Specimen fonts, licensed like Input Mono: local-only, each with a free
-   fallback in src/lib/fonts.ts. One face each, used at the normal weight. */
+/* Specimen fonts. Alpha Lyrae and Ghost Byte are licensed like Input Mono
+   (local() or dev file, else a free fallback in src/lib/fonts.ts). Departure
+   Mono is SIL OFL: committed with its licence and served to everyone.
+   One face each, used at the normal weight. */
 
 @font-face {
   font-family: "Departure Mono";
@@ -30,13 +33,13 @@
 
 @font-face {
   font-family: "Alpha Lyrae";
-  src: url("/fonts/AlphaLyrae-Medium.woff2") format("woff2");
+  src: local("Alpha Lyrae Medium"), local("AlphaLyrae-Medium"), url("/fonts/AlphaLyrae-Medium.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "Ghost Byte";
-  src: url("/fonts/GhostByte-Regular.woff") format("woff");
+  src: local("Ghost Byte Regular"), local("GhostByte-Regular"), url("/fonts/GhostByte-Regular.woff") format("woff");
   font-display: swap;
 }
 
