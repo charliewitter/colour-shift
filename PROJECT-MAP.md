@@ -1150,7 +1150,7 @@ Embed mode, the locked display/showcase mode, social preview images, photo uploa
 
 Things that aren't finished or aren't built yet.
 
-- **No automated tests.** The engine (`reachLevel`, `pickPair`, `maxChroma`, truncation) and `parseShare` have only been checked by hand in node. The proposed iOS port docs (§24) include test vectors generated from the real TypeScript, which would also give the web app a test suite.
+- **No automated tests.** The engine (`reachLevel`, `pickPair`, `maxChroma`, truncation) and `parseShare` have only been checked by hand in node. The iOS plan (`ios.md` §15) has parity fixtures generated from the real TypeScript, which would also give the web app a test suite.
 - **The address bar tint isn't set.** There's no `theme-color` meta or `viewport.themeColor`. (The style guide says so.)
 - **No automatic retry** after a failed buffer top-up; the next → at the end of the stream retries.
 - **`VIVID_WEIGHT` (2) is a first guess.** Raise it if pairs lean too much on near-black backgrounds.
@@ -1219,8 +1219,9 @@ Places where the docs no longer matched the code. Each was fixed in the doc, not
 **Owner setup (no code)**
 - Install Alpha Lyrae and Ghost Byte on the Mac, so they show on the live site there.
 
-**Proposed (needs approval)**
-- **iOS porting docs** in `docs/port/`: behaviour, state, colour engine, API and links, design tokens, iOS mapping, build order, test vectors generated from the real TypeScript. This map is a starting point for them. They describe the web app for a port; they're not web-app work.
+**iOS handoff (written; decisions open)**
+- `ios.md` (repo root) pulls together the nine research reports in `docs/research/` into one handoff for the separate native repo. It replaces the earlier `docs/port/` plan. Its §14 decision register lists what the owner must choose before Swift work starts (minimum iOS, APCA licence, Input Mono, API v1 shape, tracking trigger, device scope).
+- **Font licences to re-check:** the fonts research found Alpha Lyrae and Ghost Byte are SIL OFL, not licensed. If confirmed, ADR 0002, CLAUDE.md and §14 of this map are wrong about them, and the website could serve them like Departure Mono. Verify the licence files before changing anything.
 
 **Future project (not this repo)**
 - iOS app: its own project and spec, SwiftUI, using this site's `/api/photos` so the Unsplash key stays on the server.

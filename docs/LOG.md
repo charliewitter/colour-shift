@@ -4,6 +4,23 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
+## 2026-10-05: iOS research handoff
+
+**Done**
+- Root `ios.md`, requested by the owner: comprehensive synthesis of all nine `docs/research/` reports, checked against the web project map, CLAUDE.md, specs, ADRs and core source. Covers carry-over behaviour, Swift/SwiftUI changes, native architecture, colour/extraction parity, backend dependencies, fonts, glass, interaction, sharing, exclusions, decisions, proposed build order and acceptance checks.
+- Research conflicts made explicit: loader/preview recommendations, deployment-target floors, six OFL font families, tracking trigger, APCA licensing (including hidden swatch-label use), and Swift versus JS text-length semantics.
+- Local Markdown links and coverage of all nine research reports checked. No app/backend code, fixtures, deployment or licence purchases performed.
+
+**Decided**
+- Owner requested a single root `ios.md` to accompany PROJECT-MAP.md and CLAUDE.md as context for a separate native repo. This replaces the earlier proposed multi-document port handoff for this task.
+- Recommendations remain labelled as recommendations; owner choices and device verification remain open. Research files and existing web policies are unchanged.
+
+**Loose ends / next**
+- Review `ios.md`, then use its decision register to approve a native spec and first build step in the new repo. APCA native permission, Input Mono embedding, OS/device scope and stable API/link contracts need resolution at their respective steps.
+- Existing Unsplash production-access and live-site checks remain outstanding; no status change inferred.
+
+---
+
 ## 2026-10-05: Project map
 
 **Done**
