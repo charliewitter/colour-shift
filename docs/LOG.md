@@ -11,6 +11,7 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - Doc drift fixed (listed in the map, §21.2): style guide token table (+7 tokens), dock gaps, icon button padding, address bar tint marked not built; APP-SPEC channel readout, preview, colour fade timing; CLAUDE.md mobile stage `160px`.
 - CLAUDE.md points to the map; README lists it.
 - Revised after outside feedback: §1 now opens with a mental model, core invariants and a "where to change things" table; §4 has diagrams of how `colors`, `anchors`, `pairs` and the share-link flags connect; "pair" defined (map §6.1, CONTEXT.md widened); old §21 split into gaps / quirks and tech debt / doc drift log / what's next (by category); accessibility moved before fonts.
+- Cold-read test: a fresh agent read only the committed map and answered 10 questions. It couldn't place the screen layout, didn't know MDS, Shift Nudge, the build steps or DialKit, misread nothing, and found ~15 unclear or contradictory spots. Fixes: new "Before you start" section (screen sketch, terms, names and history); §3 diagram (`page.tsx` moved to the server side); status vs §24 contradiction; `reachLevel` "current" → anchor's lightness; stale "starting pink" given its real hex; "chrome" defined; constants' files named; smaller wording fixes.
 
 **Decided**
 - When map and code disagree: code wins on descriptions; the map's invariants win, and a contradiction is a possible bug to raise. User.

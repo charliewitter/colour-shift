@@ -12,6 +12,7 @@ The whole web app on one page: what each part is, where it lives, how the parts 
 
 ## Contents
 
+0. [Before you start](#before-you-start): the screen, terms, names and history
 1. [At a glance](#1-at-a-glance): mental model, core invariants, where to change things
 2. [Repository layout](#2-repository-layout)
 3. [Runtime architecture](#3-runtime-architecture)
@@ -39,6 +40,81 @@ The whole web app on one page: what each part is, where it lives, how the parts 
 
 ---
 
+## Before you start
+
+New to this repo? Read this section, then §1. The full glossary is `CONTEXT.md`; the terms below are the ones this map uses before explaining them.
+
+### The screen
+
+Desktop (640px and wider):
+
+```
+┌───────────────────────────┬───────────────────────────┐
+│ [FONT ▾]                  │                           │
+│        COLOUR PANEL       │        PHOTO PANEL        │  ← the stage
+│   background colour, with │   Unsplash photo; ← → on  │
+│   the sample text "Aa" in │   hover; credit bottom-   │
+│   the text colour         │   right                   │
+├───────────────────────────┴───────────────────────────┤
+│ SLIDER PANEL (only while a colour is selected)        │
+│ OKLCH  HSB  RGB                    [channel readout]  │
+│ ━━━━━━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │
+│ ━━━━━━━━━━━━━━━━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━━━━━━━━ │
+│ ━━━━━━━━━━━●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ │
+├───────────────────────────────────────────────────────┤
+│ ■#HEX ⇄ ■#HEX   WCAG|APCA │ [levels] AA 5.21:1  ← → EXPORT │  ← the dock
+└───────────────────────────────────────────────────────┘
+```
+
+Mobile (narrower than 640px): the same parts stacked, top to bottom: colour panel, photo panel, slider panel (when open), then the **bottom bar** (a row of big colour blocks with swap between them, the levels when open, then WCAG|APCA, the score and a share button). Fuller sketches: APP-SPEC "Content"; the visual source of truth is Figma.
+
+### Terms
+
+| Term | Means |
+|---|---|
+| **Pair** | A text colour + a background colour. "The pair" = the one on screen (§6.1). |
+| **Text colour / background colour** | The two colours of the pair. In code: `Role` = `"text"` / `"bg"`. |
+| **Active colour** | Whichever colour is selected for editing (or none). Selecting one opens the slider panel. It follows its value through a swap: if the text colour is active and you swap, that same colour, now the background, stays active. |
+| **Anchor** | Each colour as it was last *set* (by a slider, a swap, or a photo's pair). Level clicks start from the anchor so repeated clicks don't wash the colour out (ADR 0005). |
+| **Contrast method** | WCAG 2 or APCA: the two standards for scoring contrast. |
+| **Score** | The pair's contrast under the current method, with its grade: `AA 5.21:1`, `Content Lc -64.3`. |
+| **Lc** | APCA's contrast number ("lightness contrast"), roughly −108 to +106. Its sign says which way round: negative = light text on dark. |
+| **Grade / level / passing level** | A grade is a named band (AA, Body…). A level is the threshold where a grade starts (WCAG 4.5, APCA 60…), shown as a button. The passing level is the highest one the pair meets, highlighted. Clicking a level moves a colour until the pair just reaches it. |
+| **Colour mode / channel** | The model the sliders edit in (OKLCH, HSB, RGB) and its three values (one slider each). |
+| **Photo colour / photo's pair** | The ~6 colours node-vibrant finds in a photo; the pair `pickPair` chooses from them. |
+| **Photo stream** | The list of photos you move through with ← →, including ones loaded ahead. |
+| **Stage, colour panel, photo panel** | The main area; its left half (the pair + sample text) and right half (the photo). |
+| **Dock / bottom bar / swatch row** | The control bar at the bottom: desktop / mobile / the mobile bar's row of colour blocks. |
+| **Specimen font** | The font the sample text is set in (one of seven). |
+| **Colour fade** | How a colour change animates: slow for a new photo's pair (`"photo"`), quick for swap or a level (`"step"`), instant for slider drags (`"none"`). |
+| **Roll** | The score and hex values changing character by character, like a ticker. |
+| **Chrome** | The app's own interface (bars, buttons, panels), as opposed to the user's colours and the photo. Not the browser. |
+| **Visual-only state** | State that only affects how something animates or looks for a moment (a photo sliding out, a "COPIED" label), so it lives in that component instead of `ColorShift`. |
+
+### Names and history
+
+| Name | Means |
+|---|---|
+| **The owner** | The one person this is built by and for. |
+| **MDS** | The designer whose app *Color Shift* inspired this one. His repo sits next to this one at `../color-shift`, as reference only: the look and stack follow it, but no code was copied. |
+| **Shift Nudge** | The design course site MDS's version runs inside. Its wiring (base path, tracking tags, embed messaging) was deliberately left out. |
+| **Build steps 0–8** | The order the app was built in (SPEC.md): 0 setup, 1 two colours + score, 2 sliders + levels, 3 photos, 4 sample text + fonts, 5 share + export, 6 mobile, 7 motion polish, 8 deploy. All done. |
+| **The LOG** | `docs/LOG.md`: one entry per session, newest first. "From the log" = the reason is recorded there. |
+| **ADR 000N** | A decision record in `docs/adr/` (§18.1). |
+| **DialKit, Agentation** | Developer tools used during steps 6–7 to tune animation values live and leave notes on the UI. Removed at step 8; their tuned values are now plain constants. |
+| **Figma** | The design file. Its layer names use the same terms as this map. |
+| **imgix** | The image service behind Unsplash's photo URLs. It resizes a photo from parameters in its URL (`w=1600`). |
+| **ƒ** | The mark Next.js's build output puts beside a page that's rendered per request instead of once at build time. |
+| **react-hooks 7** | Version 7 of the ESLint plugin for React hooks (a lint rule set, not React itself). |
+| **Demo key** | Unsplash's starter access key: 50 requests/hour until production access is approved. |
+| **Production access** | Unsplash's approval for a live app: a much higher hourly limit. Applied for with the live URL and screenshots. |
+| **`duat3`** | The Vercel team (account) the project lives under. |
+| **Secret** | A Vercel environment variable stored so it can't be read back, only replaced. |
+| **`mWeb`** | The Figma section holding the mobile web designs. |
+| **Claude's `!`** | In Claude Code, a line starting with `!` runs as a shell command in the session. Long-running ones get moved to the background, which is why `pnpm dev` runs in its own Terminal. |
+
+---
+
 ## 1. At a glance
 
 | | |
@@ -55,7 +131,7 @@ The whole web app on one page: what each part is, where it lives, how the parts 
 | **Tests** | None (see §21) |
 | **Design source** | [Figma: Colour Shift](https://www.figma.com/design/IFKpGTC3reLa2GWP6go6KH/Colour-Shift?node-id=0-1): desktop frames, plus the `mWeb` section for mobile. Wins over the style guide (ADR 0001). |
 | **Reference** | `../color-shift` (by MDS). Reference only; no code copied. |
-| **Status** | Build steps 0–8 done. Waiting on Unsplash production access (the demo key allows 50 requests/hour). |
+| **Status** | Build steps 0–7 done. Step 8 (deploy) is live but not closed: it waits on Unsplash production access (the demo key allows 50 requests/hour) and the owner's browser check (§24). |
 
 ### 1.1 Mental model
 
@@ -82,8 +158,8 @@ Rules the code must keep. Read these before changing anything. Breaking one is a
 
 **State**
 - `ColorShift` owns all app state. No context, no state library. Leaf components hold only visual-only state (a leaving photo, a rolling label, a confirmation timer).
-- `colors` is the pair on screen. `anchors` is each colour as last *set* (by the user, a photo, swap or the fallback).
-- Anything that sets a colour on the user's behalf writes **both** `colors` and `anchors`: a photo's pair, a slider edit, swap, the fallback pair. The one exception: shared colours survive the first photo shown (`keepSharedColors`).
+- `colors` is the pair on screen. `anchors` is each colour as last *set* (by a slider edit, swap, a photo's pair or the fallback pair).
+- Anything that sets a colour writes **both** `colors` and `anchors`: a slider edit, swap, a photo's pair, the fallback pair. The one exception: colours from a share link survive the first photo shown (`keepSharedColors`, §9.3).
 - Level clicks **read** the anchor and write `colors` only. They never touch `anchors` (ADR 0005).
 - Changing the colour mode never changes a colour.
 - The active colour follows its value through a swap.
@@ -102,7 +178,7 @@ Rules the code must keep. Read these before changing anything. Breaking one is a
 
 **Presentation**
 - Desktop and mobile share the same state and callbacks; only the layout differs. Both bars are always rendered and CSS picks one.
-- Chrome uses tokens only. Inline style colours only for values that are state (§11.4).
+- The app's own interface ("chrome": bars, buttons, panels) uses design tokens only, never raw colour values. Inline style colours are only for values that are state, like the pair (§11.4).
 - Motion is CSS only. Under reduced motion, animations are 1ms (not `none`) so end events still fire.
 - The address bar is never updated; share links are built only when asked for.
 
@@ -142,7 +218,7 @@ Rules the code must keep. Read these before changing anything. Breaking one is a
 
 ## 2. Repository layout
 
-Every committed file, with what it's for. Line counts are as of this writing.
+Every committed file, with what it's for. Line counts show rough size only (as of 2026-10-05); nothing else in this map refers to line numbers.
 
 ```
 colour-shift/
@@ -203,7 +279,8 @@ colour-shift/
 ├── eslint.config.mjs            next core-web-vitals + typescript configs
 ├── next.config.ts               allowedDevOrigins (LAN phones can use `pnpm dev`)
 ├── package.json                 Scripts: dev, build, start, lint. packageManager pins pnpm 12.6.0
-├── pnpm-workspace.yaml          allowBuilds (sharp, unrs-resolver off); minimumReleaseAgeExclude for Next 16.3.7 packages
+├── pnpm-workspace.yaml          allowBuilds: which packages may run install scripts (sharp, unrs-resolver: no).
+│                                minimumReleaseAgeExclude: pnpm only installs releases older than a minimum age; Next 16.3.7's packages are exempt
 ├── postcss.config.mjs           @tailwindcss/postcss
 ├── tsconfig.json                strict, bundler resolution, `@/*` → `src/*`
 ├── .gitignore                   secrets, build output, .vercel, licensed fonts (public/fonts/* except DepartureMono-*)
@@ -230,23 +307,25 @@ app/api/photos/route.ts ──► types/photo.ts   (server only; no lib/ imports
 ## 3. Runtime architecture
 
 ```
-                    Browser                                    Vercel (server)                Unsplash
-┌──────────────────────────────────────────────┐   ┌───────────────────────────────┐   ┌──────────────────┐
-│ page.tsx (server render, per request)        │   │                               │   │                  │
-│   parseShare(searchParams) → <ColorShift>    │   │                               │   │                  │
-│                                              │   │                               │   │                  │
-│ ColorShift (client, all state)               │   │ GET /api/photos               │   │ api.unsplash.com │
-│   lib/photos.ts ── fetch ───────────────────────► │   ?count=N  → N × /photos/random?query=word ──────► │
-│                                              │   │   ?id=X     → /photos/X ──────────────────────────► │
-│                                              │   │   ?download=X → /photos/X/download ───────────────► │
-│                                              │   │ Holds UNSPLASH_ACCESS_KEY      │   │                  │
-│   <img src=images.unsplash.com/…&w=1600> ─────────────────────────────────────────────► images (imgix)   │
-│   node-vibrant reads the 200px copy ──────────────────────────────────────────────────► images (imgix)   │
-│   color-engine: pickPair, contrast, sliders  │   │                               │   │                  │
-└──────────────────────────────────────────────┘   └───────────────────────────────┘   └──────────────────┘
+          Browser                              Vercel (server)                        Unsplash
+┌──────────────────────────────┐   ┌──────────────────────────────────────┐   ┌──────────────────────┐
+│                              │   │ page.tsx  (on each request to /)     │   │                      │
+│  first HTML ◄───────────────────── parseShare(searchParams)             │   │                      │
+│                              │   │   → renders <ColorShift shared>      │   │                      │
+│ ColorShift (all state)       │   │                                      │   │                      │
+│   lib/photos.ts ── fetch ───────► │ GET /api/photos  (holds the key)     │   │ api.unsplash.com     │
+│                              │   │   ?count=N → N × /photos/random ───────► │                      │
+│                              │   │   ?id=X    → /photos/X ────────────────► │                      │
+│                              │   │   ?download=X → /photos/X/download ────► │                      │
+│                              │   └──────────────────────────────────────┘   │                      │
+│   <img> full photo, 1600px ─────────────────────────────────────────────────► images CDN (imgix)   │
+│   node-vibrant, 200px copy ─────────────────────────────────────────────────► images CDN (imgix)   │
+│   color-engine: pickPair,    │                                              │                      │
+│   contrast, sliders          │                                              │                      │
+└──────────────────────────────┘                                              └──────────────────────┘
 ```
 
-- **Server render.** `page.tsx` is an async server component. It awaits `searchParams`, validates them with `parseShare`, and passes plain strings (hex, ids) to the client component. Reading `searchParams` makes `/` render per request (ƒ) instead of at build time. This is why a share link paints its colours in the first HTML with no flash of defaults.
+- **Server render.** `page.tsx` is an async server component. It awaits `searchParams`, validates them with `parseShare`, and passes plain strings (hex, ids) to the client component. Reading `searchParams` makes `/` render per request (shown as ƒ in Next's build output) instead of at build time. This is why a share link paints its colours in the first HTML with no flash of defaults.
 - **Client app.** Everything else runs in the browser. `ColorShift` holds all state and passes values and callbacks down.
 - **The only server code** is `/api/photos`. It's a thin proxy: no database, no cache (`cache: "no-store"` on every Unsplash call), no auth.
 - **Images go straight to Unsplash's CDN** (imgix), not through Vercel. Sizes come from URL parameters. `next/image` is not used for photos (it is used for the small UI icons).
@@ -288,7 +367,7 @@ photoIndex ─► photo = photos[photoIndex] ─► pairs[photo.id] ready? ─�
                        during render, if pairFor ≠ photo.id:
                          pairFor = photo.id
                          keepSharedColors? ── yes ─► clear the flag, keep colours (once)
-                                          └── no ──► colors = anchors = pair, fade "photo"
+                                          └── no ──► colors = anchors = pair, colour fade "photo" (§16)
                        not ready yet: pairFor = null, colours stay until it arrives
 ```
 
@@ -310,7 +389,7 @@ share link ─► parseShare (server) ─► shared
 |---|---|---|---|---|
 | `sharedColors` | `Pair \| null` | parsed from `shared.colors` | The share link's pair as culori colours. Never changes after mount. | (initialiser only) |
 | `colors` | `Pair` | `sharedColors ?? START_COLORS` | The pair on screen. Culori objects in their last-edited mode, not hex. | photo pair, slider edit, swap, level, fallback |
-| `anchors` | `Pair` | same as `colors` | Each colour as the user last set it (ADR 0005). Levels work from these. | photo pair, slider edit, swap, fallback. **Never** by levels. |
+| `anchors` | `Pair` | same as `colors` | Each colour as last set: by a slider edit, swap, a photo's pair or the fallback (ADR 0005). Levels work from these. | photo pair, slider edit, swap, fallback. **Never** by levels. |
 | `activeRole` | `Role \| null` | `null` | Active colour: `"text"`, `"bg"` or none. The slider panel is open exactly when this isn't null. | picker clicks, swap, Esc |
 | `panelRole` | `Role` | `"text"` | The colour the slider panel shows. Follows `activeRole` during render, but keeps the last value while the panel closes so its contents don't blank mid-animation. | set during render |
 | `colorMode` | `ColorMode` | `"hsb"` | Slider colour mode. Changing it never changes the colour. | mode tabs |
@@ -325,7 +404,7 @@ share link ─► parseShare (server) ─► shared
 | `pairs` | `Record<photoId, Pair>` | shared photo → shared pair, if both given | Each photo's extracted pair, kept so showing a photo is instant and ← restores its original pair. | extraction effect |
 | `pairFor` | `string \| null` | `null` | Which photo the colours were last set from. Guards the during-render pair sync. | set during render |
 | `colorFade` | `"photo" \| "step" \| "none"` | `"none"` | How the last colour change should animate (§16). | every colour-changing action |
-| `keepSharedColors` | `boolean` | `sharedColors !== null` | One-shot flag: the first photo shown skips its pair, so shared colours survive even if the shared photo failed. | set during render |
+| `keepSharedColors` | `boolean` | `sharedColors !== null` | One-shot flag: the first photo shown skips its pair, so shared colours survive even if the shared photo failed. | cleared during render, once |
 | `waitingForShared` | `boolean` | `shared.photoId !== null` | Holds the random stream back until the shared photo has been fetched, so it goes first. | shared-photo effect |
 
 ### 4.3 Mutable refs (guards, not rendered)
@@ -378,13 +457,13 @@ share link ─► parseShare (server) ─► shared
 | Input | Function | Result |
 |---|---|---|
 | Colour picker / swatch block | `selectRole(role)` | Same role again → none (panel closes). Other role → switch (panel stays open). |
-| Swap | `swap()` | `colorFade = "step"`. Exchanges `colors.text ↔ colors.bg` **and** the anchors. The active colour follows its value: text ↔ bg. |
+| Swap | `swap()` | `colorFade = "step"`. Exchanges `colors.text ↔ colors.bg` **and** the anchors. The active colour follows its value: text ↔ bg. With none active, none stays active. |
 | Slider drag / keys | `editColor(panelRole, color)` | `colorFade = "none"` (instant). Sets the colour **and** its anchor (a user edit). The new colour is stored in the slider's mode. |
 | Colour mode tab | `setColorMode` | Sliders re-read the same colour in the new mode. The colour itself is untouched. |
 | Contrast method switch | `setContrastMethod` | Score, grade, levels and passing level recompute. |
 | Score | toggle `levelsOpen` | Levels open or close. |
 | Level button | `chooseLevel(level)` | `colorFade = "step"`. Role = `activeRole ?? "text"`. Starts from that role's **anchor**, runs `reachLevel` (§6.6), sets `colors[role]`. Anchors untouched. |
-| → (photo arrow, dock arrow, ArrowRight) | `nextPhoto()` | If more photos are loaded: index + 1. At the end: `requestPhotos()`, append, then index + 1. A skip or failure does nothing. |
+| → (photo arrow, dock arrow, ArrowRight) | `nextPhoto()` | If more photos are loaded: index + 1. At the end: `requestPhotos()`, append, then index + 1. If that request is skipped (another is already in flight) or fails, nothing happens (§8.3); when the in-flight batch lands it's appended, but you stay put until you press → again. |
 | ← | `previousPhoto()` | index − 1, floored at 0. The earlier photo's **original** pair comes back (edits aren't remembered per photo; that would be history, out of scope). |
 | Space | `jumpPhoto()` | Finds the first photo after the current one not yet shown. If it's not already next, moves it to `index + 1`. Then shows it. If none is unseen: fetch a batch, insert it after the current photo, show the first. ← still returns. |
 | New photo + its pair ready | (during render) | `pairFor = photo.id`. If `keepSharedColors`: clear it and keep the colours. Otherwise `colorFade = "photo"`, colours **and** anchors = the pair. If the pair isn't ready yet, `pairFor = null` and the colours stay until it arrives. |
@@ -440,7 +519,7 @@ Slider value = culori value × `scale`.
 
 | Mode (culori mode) | Channel | culori key | Label | Scale | Slider max | Step | Decimals |
 |---|---|---|---|---|---|---|---|
-| HSB (`hsv`) | Hue | `h` | HUE | 1 | 360 | 0.1 | 1 |
+| HSB (`hsv`: culori's name for HSB) | Hue | `h` | HUE | 1 | 360 | 0.1 | 1 |
 | | Saturation | `s` | SATURATION | 100 | 100 | 0.1 | 1 |
 | | Brightness | `v` | BRIGHTNESS | 100 | 100 | 0.1 | 1 |
 | OKLCH (`oklch`) | Lightness | `l` | LIGHTNESS | 100 | 100 | 0.1 | 1 |
@@ -478,13 +557,13 @@ Binary search for the largest OKLCH chroma that sRGB can display at a given ligh
 | | 3.0 | AA Large |
 | | 4.5 | AA |
 | | 7.0 | AAA |
-| | < 1.5 | Fail |
+| | (below 1.5) | Fail |
 | APCA (`\|Lc\|`) | 30 | Spot |
 | | 45 | Headline |
 | | 60 | Content |
 | | 75 | Body |
 | | 90 | Preferred Body |
-| | < 30 | Fail |
+| | (below 30) | Fail |
 
 Grade names follow WCAG 2 SC 1.4.3/1.4.6 and APCA Bronze Simple Mode (shortest faithful versions).
 
@@ -501,12 +580,12 @@ Moves one colour's **OKLCH lightness** until the pair just reaches `target`, kee
 1. `strength(l)` = `|contrast|` with `pair[role]` set to lightness `l` (0–1). `passes(l)` = `strength(l) ≥ target`.
 2. Sample `l` at **101 points** (0, 0.01, …, 1).
 3. Wherever two neighbouring samples differ (pass vs fail), **bisect 24 times**, always keeping the passing side, so the result really meets the level.
-4. Contrast dips to about 1 where the two colours match and rises towards black and white, so there's usually a crossing on each side. Take the crossing **nearest the current lightness**.
+4. Contrast dips to about 1 where the two colours match and rises towards black and white, so there's usually a crossing on each side. Take the crossing **nearest the starting colour's lightness** (in practice the anchor's, since `chooseLevel` passes the anchor in).
 5. No crossings (nowhere passes, or everywhere does): go to whichever end (`l = 0` or `1`) gives more contrast. The score then shows what was actually reached, and the passing level stays honest (e.g. APCA 90 on mid-grey stops at `Content Lc -68.5`).
 
-`ColorShift.chooseLevel` always passes the **anchor** as the starting colour (ADR 0005). Example from the log: 90 → 30 on the starting pink gave `#d2456b` (from the anchor) instead of a muddy `#907478` (compounded).
+`ColorShift.chooseLevel` always passes the **anchor** as the starting colour (ADR 0005). Example from the LOG (step 2, when the app still started on pink `#ff6f91` text on `#3a1020`): clicking APCA 90 then 30 gave `#d2456b` when working from the anchor, but a muddy `#907478` when each click worked from the previous result.
 
-Every level click goes **up or down** to just reach the target, so every level is one click away.
+Every level click goes **up or down** to just reach the target, so every *reachable* level is one click away; an unreachable one gets as close as it can (step 5).
 
 ### 6.7 `pickPair(photoColors)`: pairing from a photo
 
@@ -599,7 +678,7 @@ The demo key allows **50 requests/hour**. Each random photo costs 1 call; each s
 | Fresh load | 6 random (two batches of 3: the first load, then a top-up to 3 ahead) + 1 download = **7** |
 | Share link with a photo | 1 by id + 3 random + 1 download = **5** |
 | Share link whose photo fails | 1 + 6 + 1 = **8** |
-| Each → after that | ~1 random (topping up) + 1 download |
+| Each → after that | 1 download, plus a batch of 3 random every third step (~1 per photo) |
 
 When the limit is hit, Unsplash returns 403 (`x-ratelimit-remaining: 0`) → the route returns 502 → the client warns and shows the fallback pair on first load (§8.4).
 
@@ -691,7 +770,7 @@ Each field is checked on its own; anything missing or invalid becomes `null` and
 | `fg` + `bg` | **both** match `/^[0-9a-f]{6}$/i`; otherwise both are ignored |
 | `algo` | `wcag` or `apca` |
 | `font` | one of the seven ids |
-| `text` | any string, cut to 100 characters (`MAX_TEXT_LENGTH`) |
+| `text` | any string, cut to 100 characters (`MAX_TEXT_LENGTH`, in `share.ts`) |
 
 `NOTHING_SHARED` is the all-null value.
 
@@ -717,7 +796,7 @@ Each field is checked on its own; anything missing or invalid becomes `null` and
 | `shareLink({ url, filename, markdown })` | `navigator.share` with the `.md` file + URL. Tries `text/markdown`, then `text/plain` (via `canShare`), then the URL alone. Returns `"shared"`, `"cancelled"` (AbortError: the person closed the sheet) or `"unsupported"` (no share API, or any other error). |
 
 - **Filename:** `colour-shift-<fghex>-<bghex>.md` (no `#`).
-- **Desktop:** EXPORT → COPY URL, DOWNLOAD .MD; the toggle's label rolls to CLOSE. Confirmation labels (`COPIED`, `DOWNLOADED`) last 1.5s and reserve the longest label's width (`StableLabel`), so nothing nudges.
+- **Desktop:** EXPORT → COPY URL, DOWNLOAD .MD; the toggle's label rolls to CLOSE. Confirmation labels (`COPIED`, `DOWNLOADED`) last 1.5s and reserve the longest label's width (`StableLabel`, in `dock.tsx`), so nothing nudges.
 - **Mobile (ADR 0006):** the share button opens the native share sheet (which already offers copy, Save to Files, Messages, AirDrop). It must run **straight after the tap**, with no awaits before `navigator.share`. It needs **HTTPS**, so test on a Vercel preview, not LAN dev. `"unsupported"` → the export options take over the bottom bar's row.
 
 ---
@@ -737,7 +816,7 @@ Each field is checked on its own; anything missing or invalid becomes `null` and
 │       ├── <PhotoLayer> current (slide in / fade in, preview under)
 │       ├── credit (desktop: bottom-right, long; mobile: top-left, short)
 │       └── <PhotoArrow> ×2
-├── <Reveal open={activeRole}>                            ui/reveal.tsx
+├── <Reveal open={activeRole !== null}>                            ui/reveal.tsx
 │   └── <SliderPanel color={colors[panelRole]}>           slider-panel.tsx
 │       ├── mode tabs (<Button selected>) ×3
 │       ├── channel readout
@@ -763,9 +842,9 @@ Each field is checked on its own; anything missing or invalid becomes `null` and
 | `PhotoLayer` | `photo`, `preview`, `className`, `onAnimationEnd` | `loaded`, `withPreview` (read once) | Preview: the 200px copy, `blur-xl scale-110`. Full photo fades in over 400ms when loaded. The first photo gets no preview: a quick 200ms fade. `onAnimationEnd` ignores bubbled events from children. |
 | `PhotoArrow` | direction, label, onClick | none | 40px, canvas fill, 20px icon (16px on mobile). Visible on panel hover or focus; always on `pointer-coarse`. |
 | `SliderPanel` | `color`, `colorMode`, callbacks | `readoutChannel`, `readoutVisible`, fade timer | Readout shows on slider hover, focus or change; fades 1s (`READOUT_FADE_DELAY`) after release or pointer leave; only shown if the channel belongs to the current mode. Sliders keyed `${mode}-${key}`. |
-| `Dock` | pair, active role, method, levels, export, callbacks | none | Desktop only. `grid-cols-2`, 56px tall, `px-4`. Left half: pickers + swap (4px apart) … method switch, ending 12px left of centre. Right half: levels + score from 12px right of centre, growing rightwards; arrows + export pushed right. **The switch never moves.** |
+| `Dock` | pair, active role, method, levels, export, callbacks | none | Desktop only. `grid-cols-2`, 56px tall, `px-4`. Left half: pickers + swap (4px apart) at the left edge, empty space, then the method switch ending 12px left of centre. Right half: levels + score from 12px right of centre, growing rightwards; arrows + export pushed right. **The switch never moves.** |
 | `ExportControls` (in `dock.tsx`) | `open`, toggle, copy, download | `done`, timer | Focus to COPY URL on open, back to the toggle on close. Also used by `BottomBar` as the share fallback (always `open` there). |
-| `BottomBar` | like `Dock` + `onShare` | none (refs) | Mobile only. Swatch row 64px, columns `1fr 1fr 1fr` / `2fr 1fr 1fr` / `1fr 1fr 2fr` (active one gets half), animated. Levels in a `Reveal` (16px gap inside, so it collapses too). Row: method switch + score (outlined at rest, filled while open) … share. Safe-area bottom padding. Hands focus back to the share button when export closes. |
+| `BottomBar` | like `Dock` + `onShare` | none (refs) | Mobile only. Swatch row 64px, three columns: text block · swap button · background block. Widths `1fr 1fr 1fr` (none active), `2fr 1fr 1fr` (text active) or `1fr 1fr 2fr` (background active), so the active block takes half the row; the change animates. Levels in a `Reveal` (16px gap inside, so it collapses too). Row: method switch + score (outlined at rest, filled while open) … share. Safe-area bottom padding. Hands focus back to the share button when export closes. |
 | `SwatchBlock` (in `bottom-bar.tsx`) | label, colour, active, onClick | none | Full-height block in the colour; hex in `readableOn` black/white, rolling. Hairline inset edge. |
 
 ### 11.3 UI pieces (`src/components/ui/`)
@@ -909,15 +988,15 @@ CSS only: transitions, `@starting-style` (`starting:`) and keyframes. No GSAP or
 | Photo slide (desktop) | `animate-slide-{in,out}-{left,right}` keyframes | 600ms ease-out |
 | Photo crossfade (mobile) | `animate-fade-in` (new) + `animate-hold` (old stays opaque underneath so its `animationend` still fires) | 600ms |
 | Full photo over preview | `PhotoLayer` `duration-400` | 400ms (first photo: 200ms default) |
-| Colour fade: photo | `COLOR_FADE_MS.photo` → `--colour-fade-*` | 100ms delay + 700ms (trails the slide) |
+| Colour fade: photo | `COLOR_FADE_MS.photo` (`color-shift.tsx`) → `--colour-fade-*` | 100ms delay + 700ms (trails the slide) |
 | Colour fade: step (swap, level) | `COLOR_FADE_MS.step` | 200ms |
 | Colour fade: slider drag | `COLOR_FADE_MS.none` | instant |
-| Rolling value (score, hex, EXPORT ⇄ CLOSE) | `animate-roll-{in,out}` + `ROLL_STAGGER_MS` / `ROLL_SETTLE_MS` | 300ms, 55% travel, 0.5px blur, 12ms stagger; changes < 300ms apart show instantly |
+| Rolling value (score, hex, EXPORT ⇄ CLOSE) | `animate-roll-{in,out}` (`globals.css`) + `ROLL_STAGGER_MS` / `ROLL_SETTLE_MS` (`ui/roll-text.tsx`) | 300ms, 55% travel, 0.5px blur, 12ms stagger; changes < 300ms apart show instantly |
 | Export options pop | `animate-pop-left` | 400ms, 16px, overshoot `cubic-bezier(0.34, 1.56, 0.64, 1)`; close instantly |
 | Panels (slider panel, mobile levels) | `Reveal` | grid row 0fr ↔ 1fr + fade + 4px, both ways |
 | Font menu, desktop levels | `starting:` | fade + 4px drop / 8px from the left on open; close instantly |
 | Grip | `Slider` | 8px → 24px glass on hover/drag |
-| Channel readout | `SliderPanel` | fades 200ms, 1s after release |
+| Channel readout | `READOUT_FADE_DELAY` (`slider-panel.tsx`) | fades 200ms, 1s after release |
 | Mobile swatch row | `transition-[grid-template-columns]` | 200ms |
 
 **Rules:** live input is instant; menus and inline options open softly and close instantly; panels that change the layout animate both ways; small distances (4/8/16px, only the photo moves full width); colours trail the photo.
@@ -1092,7 +1171,7 @@ Things that work as intended, or were seen and accepted. Don't "fix" a quirk wit
 - **Score reads `Fail 1.00:1`** until the first pair arrives (the start colours are equal).
 - **Dock swatches, hex and score** roll or snap while the colour panel fades (exact data first).
 - **Photo credit is faint on light photos** (fine for now).
-- **A drag's first change** may start a roll before "settle" cuts it off (not seen as a problem yet).
+- **A drag's first change** may start a roll before the settle check (`ROLL_SETTLE_MS`: changes under 300ms apart show instantly) cuts it off. Not seen as a problem yet.
 - **A longer leaving value** spills briefly into the button padding while it rolls out.
 - **Desktop photo arrows jump left** when the export options open (not animated).
 - **Rapid ← → mid-slide** drops the older leaving photo abruptly.
