@@ -163,13 +163,16 @@ export function ExportControls({
     timer.current = window.setTimeout(() => setDone(null), 1500);
   }
 
-  // One toggle button that stays put: its label rolls EXPORT ⇄ CLOSE. The options fade in with
-  // a small drop to its left (@starting-style) and close instantly.
+  // One toggle button that stays put: its label rolls EXPORT ⇄ CLOSE. The options pop out to its
+  // left together with a little overshoot (user); they close instantly.
   return (
     <div className="flex items-center gap-[7px]">
       {open && (
-        <div className="flex items-center gap-[7px] transition starting:-translate-y-1 starting:opacity-0">
-          <Button ref={copyButton} onClick={async () => (await onCopyUrl()) && confirm("copy")}>
+        <div className="flex animate-pop-left items-center gap-[7px]">
+          <Button
+            ref={copyButton}
+            onClick={async () => (await onCopyUrl()) && confirm("copy")}
+          >
             <StableLabel label={done === "copy" ? "COPIED" : "COPY URL"} longest="COPY URL" />
           </Button>
           <Button
