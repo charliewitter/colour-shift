@@ -60,16 +60,47 @@ Defined once as CSS variables in `globals.css`. Components use the tokens, never
 
 ## Motion
 
-CSS transitions only.
+CSS only: transitions, `@starting-style` and keyframes (no GSAP). Motion is quick and small, and it never gets in the way of a value you're changing.
 
-- **Default timing:** `0.2s cubic-bezier(0.33, 1, 0.68, 1)`
-- **Colour crossfade:** 0.7s after a 0.1s delay, so the colours trail the photo slightly (softer; changed from ~0.4s on 2026-09-30). Only when colours come from a photo; hand edits are instant. **Photo slide:** 0.6s.
-- **First photo:** no slide and no blurred preview; the photo fades in over 0.2s and the colours fade in from an empty dark panel.
-- **Panels open and close** with `grid-template-rows: 0fr ↔ 1fr`, a fade, and a 4px vertical slide (slider panel, mobile levels). Desktop levels and export options fade in (levels slide 8px from the left) and close instantly, like the font menu.
-- **Colour fades by kind of change:** photo 0.1s delay + 0.7s; single action (swap, level) 0.2s; slider drag instant.
-- **Rolling values** (score, hex): per character, left to right. 300ms, 55% of the line, 0.5px blur, 12ms stagger. Changes less than 300ms apart show instantly.
-- **Mobile:** vertical motion only. Photos crossfade (0.6s) instead of sliding. The swatch row's widths animate when the active colour changes (a resize, not a slide).
-- **Reduced motion:** respect `prefers-reduced-motion` and turn transitions off.
+**Rules**
+
+- **Live input is instant.** Anything driven by a drag or fast changes (slider colours, rolling values) shows each change straight away. Animation is for single, discrete changes.
+- **Open softly, close instantly** for menus and inline options (font menu, desktop levels, export options). Panels that change the layout (slider panel, mobile levels) animate both ways, so nothing jumps.
+- **Small distances:** 4px for drops and panel slides, 8px for levels, 16px for the export pop. Only the photo moves a full width.
+- **Colours trail the photo** a little, so the photo leads and the pair follows.
+
+**Timing**
+
+| Use | Duration | Easing |
+| --- | --- | --- |
+| Default (hover, press, fades, panels) | 200ms | `cubic-bezier(0.33, 1, 0.68, 1)` (ease-out) |
+| Photo slide (desktop) / crossfade (mobile) | 600ms | ease-out |
+| Colour fade, from a photo | 100ms delay + 700ms | ease-out |
+| Colour fade, single action (swap, level) | 200ms | ease-out |
+| Colour fade, slider drag | instant | — |
+| Rolling value | 300ms, 12ms stagger per character | ease-out |
+| Export options pop | 400ms | `cubic-bezier(0.34, 1.56, 0.64, 1)` (slight overshoot) |
+| Full photo over its blurred preview | 400ms | ease-out |
+| Channel readout fade-out | 200ms, after 1s | ease-out |
+
+The shipping values come from DialKit tuning; its panels hold the same numbers as defaults.
+
+**Pieces**
+
+- **Photo change:** desktop slides the photo in from the side you're moving towards (→ from the right, ← from the left). Mobile crossfades instead (vertical motion only on mobile). The blurred 200px preview sits under the full photo until it loads. The first photo has no slide and no preview: it fades in over 0.2s, and the colours fade in from an empty dark panel.
+- **Colour fades:** the colour panel, swatches and mobile swatch blocks all fade with the timing above. The fade depends on what changed the colour, not on where it shows.
+- **Panels** (slider panel, mobile levels): row height `0fr ↔ 1fr`, a fade and a 4px vertical slide, both ways. The slider panel keeps showing the last colour while it closes.
+- **Font menu:** fades in with a 4px drop; closes instantly.
+- **Desktop levels:** fade in sliding 8px from the left (they open sideways from the score); close instantly.
+- **Export:** the toggle stays put and its label rolls EXPORT ⇄ CLOSE. COPY URL and DOWNLOAD .MD pop out to its left together (16px slide, slight overshoot); close instantly.
+- **Rolling values** (score, hex, EXPORT ⇄ CLOSE): the old value rolls up and out while the new one rolls up from below, character by character left to right (55% of the line, 0.5px blur). Changes less than 300ms apart (a drag) show instantly. The box takes the new value's width as soon as the roll starts.
+- **Buttons:** 200ms fill change on hover; pressed scales to 0.95 and pops back.
+- **Slider grip:** grows from 8px to 24px (glass look) on hover and while dragged.
+- **Channel readout:** shows on slider hover, focus or drag; fades out 1s after release or leaving.
+- **Sample text:** dims to 65% on hover (reads as editable), full while editing.
+- **Mobile swatch row:** column widths animate when the active colour changes (a resize, not a slide).
+
+**Reduced motion:** with `prefers-reduced-motion`, transitions are 0 and animations 1ms, so everything snaps. (1ms, not none: code waiting for an animation to end, like the leaving photo, still hears it end.)
 
 ## Details
 

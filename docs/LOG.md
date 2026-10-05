@@ -4,7 +4,7 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 
 ---
 
-## 2026-10-01: Step 7 (motion polish), in progress
+## 2026-10-01 → 05: Step 7 (motion polish), done
 
 **Done**
 - 7A: panels animate both ways. `ui/reveal.tsx` (grid row 0fr → 1fr + fade + 4px slide; closed = `inert`) wraps the slider panel and the mobile levels row. Slider panel stays mounted; `panelRole` keeps the last colour while closing. Desktop levels and export options fade in (`starting:`), close instantly.
@@ -16,20 +16,23 @@ Newest first. One entry per session: what got done, what was decided, loose ends
 - Export options pop out to the left together (slide + slight overshoot), close instantly (user).
 - Desktop dock controls centred vertically (`px-4`, was `p-4`): 28px buttons had 16px above, 12px below. Style guide updated.
 - Channel readout also shows on slider hover and focus, so you can see what a slider is before changing it (user).
+- Style guide Motion section rewritten: rules, timing table, one line per animated piece, reduced motion.
 
 **Decided**
 - Text roll: live while changing fast, roll only single changes (not hold-then-roll). User.
 - Panel fade (200ms, overlaps the grow) is subtle but fine for now. User.
 - Explanations to the user: short bullets (CLAUDE.md). User.
+- Motion rules (style guide): live input instant; menus and inline options open softly, close instantly; layout panels animate both ways; small distances; colours trail the photo.
+- Export options move together, not staggered (reads as one group). User.
 
 **Loose ends**
 - A drag's first change may start a roll before "settle" cuts it off (not reported as visible yet).
 - A longer leaving value spills briefly into button padding while rolling out (accepted).
-- Check `colour-shift.vercel.app` still 503 (pushed while paused).
+- Not pushed yet: `! git push` (deploys to paused Production), then check `colour-shift.vercel.app` still 503.
+- Desktop photo arrows jump left when export options open (not animated; not reported as a problem).
 
 **Next**
-- Finish step 7: style guide motion section → close the step in LOG.
-- Then step 8: deploy (Production Unsplash key, unpause, fonts licensing, DialKit removal decision).
+- Step 8: deploy. Plan first: Production Unsplash key, unpause, font web licences + how files reach Vercel, DialKit removal decision.
 
 ---
 
